@@ -1,0 +1,103 @@
+﻿<Window x:Class="CountriesAPP.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CountriesAPP"
+        mc:Ignorable="d"
+        Title="World of Countries" Height="600" Width="900"
+        FontWeight="Medium"
+        TextElement.FontSize="12"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:wpf="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}">
+    <Grid>
+        <!--#region Window Layout Definitions-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <!--#endregion-->
+        <!--#region Header Row-->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <!--#region Title-->
+            <Grid Grid.Column="0">
+                <Label Content="World" Margin="5" FontSize="28"/>
+                <Label Content="of" Margin="5,40,0,0" FontSize="15"/>
+                <Label Content="Countries" Margin="5,60,0,0" FontSize="32"/>
+            </Grid>
+            <!--#endregion-->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                <!--#region Exit/Help/About Buttons Row-->
+                <Grid Grid.Row="0" HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="BtnHelp" ToolTip="Don't know how to work with this App?!" BorderThickness="0" Foreground="Red" BorderBrush="{x:Null}" Background="{x:Null}">
+                            <materialDesign:PackIcon Kind="Help"/>
+                        </Button>
+                        <Button x:Name="BtnAbout" ToolTip="Who made this?!" BorderThickness="0" Foreground="WhiteSmoke"  BorderBrush="{x:Null}" Background="{x:Null}">
+                            <materialDesign:PackIcon Kind="About"/>
+                        </Button>
+                        <Button x:Name="BtnExit" ToolTip="Get out of here!" BorderThickness="0" Foreground="GreenYellow" BorderBrush="{x:Null}" Background="{x:Null}" ButtonBase.Click="BtnExit_Click">
+                            <materialDesign:PackIcon Kind="ExitRun"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                <!--#endregion-->
+                <Grid Grid.Row="2"><!--ComboBox to display the countries-->
+                    <ComboBox x:Name="CbCountry" IsEditable="False" IsReadOnly="True" Margin="5" Width="350" HorizontalAlignment="Left" Background="WhiteSmoke" Foreground="Black"  SelectionChanged="CbCountry_SelectionChanged"/>
+                </Grid>
+            </Grid>
+        </Grid>
+        <!--#endregion-->
+        <Grid Grid.Row="1" Background="WhiteSmoke"/><!--Separator-->
+        <!--#region Tab Row-->
+        <Grid Grid.Row="2">
+            <TabControl ItemsSource="{Binding Countries}" Margin="0,2,0,0">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding TabName}"/>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <wpf:UserControl Content="{Binding Window}"/>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </Grid>
+        <!--#endregion-->
+        <!--#region Bottom Row - Clock and Network ON/OFF-->
+        <Grid Grid.Row="5" Background="DarkSlateGray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock x:Name="LblClock" Text="Clock here" FontSize="14" Margin="5,0,0,0"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <materialDesign:PackIcon Kind="Network" Margin="0,0,10,0"/>
+                <TextBlock x:Name="LblLoadFrom" Text="Data loaded from somewhere will appear here"/>
+            </StackPanel>
+        </Grid>
+        <!--#endregion-->
+    </Grid>
+</Window>
