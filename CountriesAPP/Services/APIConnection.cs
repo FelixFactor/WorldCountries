@@ -1,6 +1,6 @@
 ﻿namespace CountriesAPP.Services
 {
-    using CountriesAPP.API_Models;
+    using API_Models;
     using Models;
     using Newtonsoft.Json;
     using System;
@@ -37,8 +37,11 @@
                     };
                 }
 
+                //defines options for the JSON deserializer
+                var options = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, MissingMemberHandling = MissingMemberHandling.Ignore };
+
                 //converts the Json to a List of country objects
-                var countries = JsonConvert.DeserializeObject<List<Country>>(result);
+                var countries = JsonConvert.DeserializeObject<List<Country>>(result, options);
 
                 return new Response { Success = true, Result = countries };
             }

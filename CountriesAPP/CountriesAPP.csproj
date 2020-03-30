@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\EntityFramework.6.4.0\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.4.0\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -37,11 +38,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Fizzler, Version=1.2.0.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
+      <HintPath>packages\Fizzler.1.2.0\lib\netstandard2.0\Fizzler.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=1.2.2.920, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\MaterialDesignColors.1.2.2\lib\net45\MaterialDesignColors.dll</HintPath>
     </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=3.0.1.920, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\MaterialDesignThemes.3.0.1\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Sqlite, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Data.Sqlite.Core.3.1.3\lib\netstandard2.0\Microsoft.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
     <Reference Include="MyToolkit, Version=2.5.16.0, Culture=neutral, PublicKeyToken=3e349a1360994d26, processorArchitecture=MSIL">
       <HintPath>packages\MyToolkit.2.5.16\lib\portable-net45+wp8+win8+wpa81\MyToolkit.dll</HintPath>
@@ -52,8 +68,60 @@
     <Reference Include="ShowMeTheXAML, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ShowMeTheXAML.1.0.12\lib\net45\ShowMeTheXAML.dll</HintPath>
     </Reference>
+    <Reference Include="SQLite-net, Version=1.6.292.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\sqlite-net-pcl.1.6.292\lib\netstandard1.1\SQLite-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLiteNetExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\SQLiteNetExtensions.2.1.0\lib\netstandard1.1\SQLiteNetExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2, Version=2.0.2.669, Culture=neutral, PublicKeyToken=8226ea5df37bcae9, processorArchitecture=MSIL">
+      <HintPath>packages\SQLitePCLRaw.bundle_green.2.0.2\lib\net461\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core, Version=2.0.2.669, Culture=neutral, PublicKeyToken=1488e028ca7ab535, processorArchitecture=MSIL">
+      <HintPath>packages\SQLitePCLRaw.core.2.0.2\lib\netstandard2.0\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.nativelibrary, Version=2.0.2.669, Culture=neutral, PublicKeyToken=502ed628492ab262, processorArchitecture=MSIL">
+      <HintPath>packages\SQLitePCLRaw.bundle_green.2.0.2\lib\net461\SQLitePCLRaw.nativelibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.dynamic_cdecl, Version=2.0.2.669, Culture=neutral, PublicKeyToken=b68184102cba0b3b, processorArchitecture=MSIL">
+      <HintPath>packages\SQLitePCLRaw.provider.dynamic_cdecl.2.0.2\lib\netstandard2.0\SQLitePCLRaw.provider.dynamic_cdecl.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3, Version=1.1.14.520, Culture=neutral, PublicKeyToken=9c301db686d0bd12, processorArchitecture=MSIL">
+      <HintPath>packages\SQLitePCLRaw.provider.e_sqlite3.net45.1.1.14\lib\net45\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="Svg, Version=3.0.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>packages\Svg.3.0.102\lib\net452\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.112.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.Core.1.0.112.0\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.112.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.EF6.1.0.112.0\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.112.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.Linq.1.0.112.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.4.7.1\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -72,15 +140,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Interfaces\ITab.cs" />
+    <Compile Include="Models\Tab.cs" />
     <Compile Include="Services\APIConnection.cs" />
     <Compile Include="Services\Httpclient.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Models\Response.cs" />
-    <Compile Include="ShowCountryDetails.xaml.cs">
+    <Compile Include="Services\SQLiteService.cs" />
+    <Compile Include="Services\SQLService.cs" />
+    <Compile Include="Views\ShowCountryDetails.xaml.cs">
       <DependentUpon>ShowCountryDetails.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\CountryMainViewModel.cs" />
-    <Compile Include="ViewModels\CountryTabViewModel.cs" />
+    <Compile Include="Models\CountryTab.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -93,7 +165,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ShowCountryDetails.xaml">
+    <Page Include="Views\ShowCountryDetails.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -133,7 +205,256 @@
   <ItemGroup>
     <Folder Include="Controls\" />
     <Folder Include="Localization\" />
-    <Folder Include="Views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Local_Flags\afghanistan.png" />
+    <Resource Include="Local_Flags\aland.png" />
+    <Resource Include="Local_Flags\albania.png" />
+    <Resource Include="Local_Flags\algeria.png" />
+    <Resource Include="Local_Flags\americanSamoa.png" />
+    <Resource Include="Local_Flags\andorra.png" />
+    <Resource Include="Local_Flags\angola.png" />
+    <Resource Include="Local_Flags\anguilla.png" />
+    <Resource Include="Local_Flags\antarctida.png" />
+    <Resource Include="Local_Flags\antiguaBarbuda.png" />
+    <Resource Include="Local_Flags\argentina.png" />
+    <Resource Include="Local_Flags\armenia.png" />
+    <Resource Include="Local_Flags\aruba.png" />
+    <Resource Include="Local_Flags\australia.png" />
+    <Resource Include="Local_Flags\austria.png" />
+    <Resource Include="Local_Flags\azerbaijan.png" />
+    <Resource Include="Local_Flags\bahamas.png" />
+    <Resource Include="Local_Flags\bahrein.png" />
+    <Resource Include="Local_Flags\bangladesh.png" />
+    <Resource Include="Local_Flags\barbados.png" />
+    <Resource Include="Local_Flags\belgium.png" />
+    <Resource Include="Local_Flags\belize.png" />
+    <Resource Include="Local_Flags\benin.png" />
+    <Resource Include="Local_Flags\bermuda.png" />
+    <Resource Include="Local_Flags\bhutan.png" />
+    <Resource Include="Local_Flags\bolivia.png" />
+    <Resource Include="Local_Flags\bonaire.png" />
+    <Resource Include="Local_Flags\bosnia.png" />
+    <Resource Include="Local_Flags\botswana.png" />
+    <Resource Include="Local_Flags\bouvet.png" />
+    <Resource Include="Local_Flags\brazil.png" />
+    <Resource Include="Local_Flags\british_indian_ocean_territory.png" />
+    <Resource Include="Local_Flags\brunei.png" />
+    <Resource Include="Local_Flags\bulgaria.png" />
+    <Resource Include="Local_Flags\burkinafaso.png" />
+    <Resource Include="Local_Flags\burundi.png" />
+    <Resource Include="Local_Flags\camboja.png" />
+    <Resource Include="Local_Flags\cameroon.png" />
+    <Resource Include="Local_Flags\canada.png" />
+    <Resource Include="Local_Flags\capevert.png" />
+    <Resource Include="Local_Flags\cayman.png" />
+    <Resource Include="Local_Flags\central_african_republic.png" />
+    <Resource Include="Local_Flags\chad.png" />
+    <Resource Include="Local_Flags\chile.png" />
+    <Resource Include="Local_Flags\china.png" />
+    <Resource Include="Local_Flags\christmas.png" />
+    <Resource Include="Local_Flags\cocos.png" />
+    <Resource Include="Local_Flags\colombia.png" />
+    <Resource Include="Local_Flags\comoros.png" />
+    <Resource Include="Local_Flags\congo.png" />
+    <Resource Include="Local_Flags\cook_island.png" />
+    <Resource Include="Local_Flags\costa_rica.png" />
+    <Resource Include="Local_Flags\croatia.png" />
+    <Resource Include="Local_Flags\cuba.png" />
+    <Resource Include="Local_Flags\curacao.png" />
+    <Resource Include="Local_Flags\cyprus.png" />
+    <Resource Include="Local_Flags\czech_republic.png" />
+    <Resource Include="Local_Flags\denmark.png" />
+    <Resource Include="Local_Flags\djibouti.png" />
+    <Resource Include="Local_Flags\dominica.png" />
+    <Resource Include="Local_Flags\dominican_republic.png" />
+    <Resource Include="Local_Flags\ecuador.png" />
+    <Resource Include="Local_Flags\egypt.png" />
+    <Resource Include="Local_Flags\elsalvador.png" />
+    <Resource Include="Local_Flags\equatorialGuinea.png" />
+    <Resource Include="Local_Flags\eritrea.png" />
+    <Resource Include="Local_Flags\estonia.png" />
+    <Resource Include="Local_Flags\ethiopia.png" />
+    <Resource Include="Local_Flags\falkland.png" />
+    <Resource Include="Local_Flags\faroe.png" />
+    <Resource Include="Local_Flags\fiji.png" />
+    <Resource Include="Local_Flags\finland.png" />
+    <Resource Include="Local_Flags\france.png" />
+    <Resource Include="Local_Flags\frenchguiana.png" />
+    <Resource Include="Local_Flags\frenchpolinesia.png" />
+    <Resource Include="Local_Flags\frenchsouthernterritories.png" />
+    <Resource Include="Local_Flags\gabon.png" />
+    <Resource Include="Local_Flags\gambia.png" />
+    <Resource Include="Local_Flags\georgia.png" />
+    <Resource Include="Local_Flags\germany.png" />
+    <Resource Include="Local_Flags\ghana.png" />
+    <Resource Include="Local_Flags\gibraltar.png" />
+    <Resource Include="Local_Flags\greece.png" />
+    <Resource Include="Local_Flags\greenland.png" />
+    <Resource Include="Local_Flags\grenada.png" />
+    <Resource Include="Local_Flags\guadeloupe.png" />
+    <Resource Include="Local_Flags\guam.png" />
+    <Resource Include="Local_Flags\guatemala.png" />
+    <Resource Include="Local_Flags\guernsey.png" />
+    <Resource Include="Local_Flags\guinea-bissau.png" />
+    <Resource Include="Local_Flags\guinea.png" />
+    <Resource Include="Local_Flags\guyana.png" />
+    <Resource Include="Local_Flags\haiti.png" />
+    <Resource Include="Local_Flags\heardisland.png" />
+    <Resource Include="Local_Flags\holysee.png" />
+    <Resource Include="Local_Flags\honduras.png" />
+    <Resource Include="Local_Flags\hongkong.png" />
+    <Resource Include="Local_Flags\hungary.png" />
+    <Resource Include="Local_Flags\iceland.png" />
+    <Resource Include="Local_Flags\india.png" />
+    <Resource Include="Local_Flags\indonesia.png" />
+    <Resource Include="Local_Flags\iran.png" />
+    <Resource Include="Local_Flags\iraq.png" />
+    <Resource Include="Local_Flags\ireland.png" />
+    <Resource Include="Local_Flags\isleofman.png" />
+    <Resource Include="Local_Flags\israel.png" />
+    <Resource Include="Local_Flags\italy.png" />
+    <Resource Include="Local_Flags\ivoire-cote.png" />
+    <Resource Include="Local_Flags\jamaica.png" />
+    <Resource Include="Local_Flags\japan.png" />
+    <Resource Include="Local_Flags\jersey.png" />
+    <Resource Include="Local_Flags\jordan.png" />
+    <Resource Include="Local_Flags\kazakhstan.png" />
+    <Resource Include="Local_Flags\kenya.png" />
+    <Resource Include="Local_Flags\kiribati.png" />
+    <Resource Include="Local_Flags\kuwait.png" />
+    <Resource Include="Local_Flags\kyrgyzstan.png" />
+    <Resource Include="Local_Flags\laos.png" />
+    <Resource Include="Local_Flags\latvia.png" />
+    <Resource Include="Local_Flags\lebanon.png" />
+    <Resource Include="Local_Flags\lesotho.png" />
+    <Resource Include="Local_Flags\liberia.png" />
+    <Resource Include="Local_Flags\libya.png" />
+    <Resource Include="Local_Flags\liechtenstein.png" />
+    <Resource Include="Local_Flags\lithuania.png" />
+    <Resource Include="Local_Flags\luxembourg.png" />
+    <Resource Include="Local_Flags\macao.png" />
+    <Resource Include="Local_Flags\macedonia.png" />
+    <Resource Include="Local_Flags\madagascar.png" />
+    <Resource Include="Local_Flags\malawi.png" />
+    <Resource Include="Local_Flags\malaysia.png" />
+    <Resource Include="Local_Flags\maldives.png" />
+    <Resource Include="Local_Flags\mali.png" />
+    <Resource Include="Local_Flags\malta.png" />
+    <Resource Include="Local_Flags\marshallislands.png" />
+    <Resource Include="Local_Flags\martinique.png" />
+    <Resource Include="Local_Flags\mauritania.png" />
+    <Resource Include="Local_Flags\mauritius.png" />
+    <Resource Include="Local_Flags\mayotte.png" />
+    <Resource Include="Local_Flags\mexico.png" />
+    <Resource Include="Local_Flags\micronesia.png" />
+    <Resource Include="Local_Flags\moldova.png" />
+    <Resource Include="Local_Flags\monaco.png" />
+    <Resource Include="Local_Flags\mongolia.png" />
+    <Resource Include="Local_Flags\montenegro.png" />
+    <Resource Include="Local_Flags\montserrat.png" />
+    <Resource Include="Local_Flags\morocco.png" />
+    <Resource Include="Local_Flags\mozambique.png" />
+    <Resource Include="Local_Flags\myanmar.png" />
+    <Resource Include="Local_Flags\namibia.png" />
+    <Resource Include="Local_Flags\nauru.png" />
+    <Resource Include="Local_Flags\nepal.png" />
+    <Resource Include="Local_Flags\netherlands.png" />
+    <Resource Include="Local_Flags\new-caledonia.png" />
+    <Resource Include="Local_Flags\new-zealand.png" />
+    <Resource Include="Local_Flags\nicaragua.png" />
+    <Resource Include="Local_Flags\niger.png" />
+    <Resource Include="Local_Flags\nigeria.png" />
+    <Resource Include="Local_Flags\niue.png" />
+    <Resource Include="Local_Flags\norfolk.png" />
+    <Resource Include="Local_Flags\northern_mariana.png" />
+    <Resource Include="Local_Flags\northkorea.png" />
+    <Resource Include="Local_Flags\norway.png" />
+    <Resource Include="Local_Flags\oman.png" />
+    <Resource Include="Local_Flags\pakistan.png" />
+    <Resource Include="Local_Flags\palau.png" />
+    <Resource Include="Local_Flags\palestine.png" />
+    <Resource Include="Local_Flags\panama.png" />
+    <Resource Include="Local_Flags\papua.png" />
+    <Resource Include="Local_Flags\paraguay.png" />
+    <Resource Include="Local_Flags\peru.png" />
+    <Resource Include="Local_Flags\philippines.png" />
+    <Resource Include="Local_Flags\pitcairn.png" />
+    <Resource Include="Local_Flags\poland.png" />
+    <Resource Include="Local_Flags\portugal.png" />
+    <Resource Include="Local_Flags\puerto-rico.png" />
+    <Resource Include="Local_Flags\qatar.png" />
+    <Resource Include="Local_Flags\republic-of-kosovo.png" />
+    <Resource Include="Local_Flags\reunion.png" />
+    <Resource Include="Local_Flags\romania.png" />
+    <Resource Include="Local_Flags\russia.png" />
+    <Resource Include="Local_Flags\rwanda.png" />
+    <Resource Include="Local_Flags\saint-barthelemy.png" />
+    <Resource Include="Local_Flags\saint-helena.png" />
+    <Resource Include="Local_Flags\saint-kitts.png" />
+    <Resource Include="Local_Flags\saint-lucia.png" />
+    <Resource Include="Local_Flags\saint-martin.png" />
+    <Resource Include="Local_Flags\saint-pierre.png" />
+    <Resource Include="Local_Flags\saint-vincent.png" />
+    <Resource Include="Local_Flags\samoa.png" />
+    <Resource Include="Local_Flags\san-marino.png" />
+    <Resource Include="Local_Flags\saotome.png" />
+    <Resource Include="Local_Flags\saudi-arabia.png" />
+    <Resource Include="Local_Flags\senegal.png" />
+    <Resource Include="Local_Flags\serbia.png" />
+    <Resource Include="Local_Flags\seychelles.png" />
+    <Resource Include="Local_Flags\sierra-leone.png" />
+    <Resource Include="Local_Flags\singapore.png" />
+    <Resource Include="Local_Flags\sint-maarten.png" />
+    <Resource Include="Local_Flags\slovakia.png" />
+    <Resource Include="Local_Flags\slovenia.png" />
+    <Resource Include="Local_Flags\solomon-islands.png" />
+    <Resource Include="Local_Flags\somalia.png" />
+    <Resource Include="Local_Flags\south-africa.png" />
+    <Resource Include="Local_Flags\south-georgia.png" />
+    <Resource Include="Local_Flags\south-korea.png" />
+    <Resource Include="Local_Flags\south-sudan.png" />
+    <Resource Include="Local_Flags\spain.png" />
+    <Resource Include="Local_Flags\sri-lanka.png" />
+    <Resource Include="Local_Flags\sudan.png" />
+    <Resource Include="Local_Flags\suriname.png" />
+    <Resource Include="Local_Flags\svalbard.png" />
+    <Resource Include="Local_Flags\swaziland.png" />
+    <Resource Include="Local_Flags\sweden.png" />
+    <Resource Include="Local_Flags\switzerland.png" />
+    <Resource Include="Local_Flags\syria.png" />
+    <Resource Include="Local_Flags\taiwan.png" />
+    <Resource Include="Local_Flags\tajikistan.png" />
+    <Resource Include="Local_Flags\tanzania.png" />
+    <Resource Include="Local_Flags\thailand.png" />
+    <Resource Include="Local_Flags\timor.png" />
+    <Resource Include="Local_Flags\togo.png" />
+    <Resource Include="Local_Flags\tokelau.png" />
+    <Resource Include="Local_Flags\tonga.png" />
+    <Resource Include="Local_Flags\trinidad.png" />
+    <Resource Include="Local_Flags\tunisia.png" />
+    <Resource Include="Local_Flags\turkey.png" />
+    <Resource Include="Local_Flags\turkmenistan.png" />
+    <Resource Include="Local_Flags\turks-caicos.png" />
+    <Resource Include="Local_Flags\tuvalu.png" />
+    <Resource Include="Local_Flags\uganda.png" />
+    <Resource Include="Local_Flags\ukraine.png" />
+    <Resource Include="Local_Flags\united-emirates.png" />
+    <Resource Include="Local_Flags\united-kingdom.png" />
+    <Resource Include="Local_Flags\united-states-of-america.png" />
+    <Resource Include="Local_Flags\united_states_minor_outlying_islands.png" />
+    <Resource Include="Local_Flags\uruguay.png" />
+    <Resource Include="Local_Flags\uzbekistan.png" />
+    <Resource Include="Local_Flags\vanuatu.png" />
+    <Resource Include="Local_Flags\venezuela.png" />
+    <Resource Include="Local_Flags\vietnam.png" />
+    <Resource Include="Local_Flags\virgin_islands%28us%29.png" />
+    <Resource Include="Local_Flags\virgin_islands_brittish.png" />
+    <Resource Include="Local_Flags\wallis.png" />
+    <Resource Include="Local_Flags\western-sahara.png" />
+    <Resource Include="Local_Flags\yemen.png" />
+    <Resource Include="Local_Flags\zambia.png" />
+    <Resource Include="Local_Flags\zimbabwe.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -142,7 +463,20 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\ShowMeTheXAML.MSBuild.1.0.12\build\net45\ShowMeTheXAML.MSBuild.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ShowMeTheXAML.MSBuild.1.0.12\build\net45\ShowMeTheXAML.MSBuild.targets'))" />
     <Error Condition="!Exists('packages\MaterialDesignThemes.3.0.1\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\MaterialDesignThemes.3.0.1\build\MaterialDesignThemes.targets'))" />
+    <Error Condition="!Exists('packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('packages\EntityFramework.6.4.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.0\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('packages\EntityFramework.6.4.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.0\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('packages\SQLitePCLRaw.lib.e_sqlite3.2.0.2\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SQLitePCLRaw.lib.e_sqlite3.2.0.2\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets'))" />
+    <Error Condition="!Exists('packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets'))" />
+    <Error Condition="!Exists('packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets'))" />
+    <Error Condition="!Exists('packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets'))" />
   </Target>
   <Import Project="packages\ShowMeTheXAML.MSBuild.1.0.12\build\net45\ShowMeTheXAML.MSBuild.targets" Condition="Exists('packages\ShowMeTheXAML.MSBuild.1.0.12\build\net45\ShowMeTheXAML.MSBuild.targets')" />
   <Import Project="packages\MaterialDesignThemes.3.0.1\build\MaterialDesignThemes.targets" Condition="Exists('packages\MaterialDesignThemes.3.0.1\build\MaterialDesignThemes.targets')" />
+  <Import Project="packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets')" />
+  <Import Project="packages\EntityFramework.6.4.0\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.4.0\build\EntityFramework.targets')" />
+  <Import Project="packages\SQLitePCLRaw.lib.e_sqlite3.2.0.2\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets" Condition="Exists('packages\SQLitePCLRaw.lib.e_sqlite3.2.0.2\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" />
+  <Import Project="packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
+  <Import Project="packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets" Condition="Exists('packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" />
+  <Import Project="packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets" Condition="Exists('packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.14\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" />
 </Project>

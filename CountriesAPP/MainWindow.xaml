@@ -55,7 +55,7 @@
                         <Button x:Name="BtnAbout" ToolTip="Who made this?!" BorderThickness="0" Foreground="WhiteSmoke"  BorderBrush="{x:Null}" Background="{x:Null}">
                             <materialDesign:PackIcon Kind="About"/>
                         </Button>
-                        <Button x:Name="BtnExit" ToolTip="Get out of here!" BorderThickness="0" Foreground="GreenYellow" BorderBrush="{x:Null}" Background="{x:Null}" ButtonBase.Click="BtnExit_Click">
+                        <Button x:Name="BtnExit" ToolTip="Please stay a little while!" BorderThickness="0" Foreground="GreenYellow" BorderBrush="{x:Null}" Background="{x:Null}" ButtonBase.Click="BtnExit_Click">
                             <materialDesign:PackIcon Kind="ExitRun"/>
                         </Button>
                     </StackPanel>
@@ -67,13 +67,18 @@
             </Grid>
         </Grid>
         <!--#endregion-->
-        <Grid Grid.Row="1" Background="WhiteSmoke"/><!--Separator-->
+        <Grid Grid.Row="1"/><!--Separator-->
         <!--#region Tab Row-->
         <Grid Grid.Row="2">
-            <TabControl ItemsSource="{Binding Countries}" Margin="0,2,0,0">
+            <TabControl x:Name="CountryTabs" ItemsSource="{Binding Countries}" Margin="0,2,0,0">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding TabName}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding TabName}"/>
+                            <TextBlock FontWeight="Bold" Margin="5,0,0,0">
+                                <Hyperlink Command="{Binding CloseCommand}">X</Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
                     </DataTemplate>
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>
@@ -85,7 +90,7 @@
         </Grid>
         <!--#endregion-->
         <!--#region Bottom Row - Clock and Network ON/OFF-->
-        <Grid Grid.Row="5" Background="DarkSlateGray">
+        <Grid Grid.Row="5" Background="{DynamicResource MaterialDesignPaper}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -95,7 +100,7 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <materialDesign:PackIcon Kind="Network" Margin="0,0,10,0"/>
-                <TextBlock x:Name="LblLoadFrom" Text="Data loaded from somewhere will appear here"/>
+                <TextBlock x:Name="LblLoadFrom" Text="Loading Data"/>
             </StackPanel>
         </Grid>
         <!--#endregion-->

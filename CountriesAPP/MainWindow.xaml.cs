@@ -3,12 +3,13 @@
     using API_Models;
     using Models;
     using Services;
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using ViewModels;
-    using System;
+    using Views;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -19,18 +20,18 @@
         private NetworkService networkService;
         private APIConnection apiConnection;
         private List<Country> Countries;
+        CountryMainViewModel countriesTab;
+        SQLService dataService;
+        //SQLiteService dbService;
         #endregion
 
         public MainWindow()
         {
             InitializeComponent();
-
-            //testing phase
-            //var countriestabs = new CountryMainViewModel();
-            //countriestabs.Countries.Add(new CountryTabViewModel("Portugal"));
-
-            //this.DataContext = countriestabs;
-
+            countriesTab = new CountryMainViewModel();
+            Countries = new List<Country>();
+            dataService = new SQLService();
+            //dbService = new SQLiteService();
             LoadContent();
         }
 
@@ -43,27 +44,39 @@
         /// </remarks> 
         private async void LoadContent()
         {
-            //check if there is internet connection
-            networkService = new NetworkService();
-
-            if (!networkService.CheckNetConnection())
+            try
             {
-                LoadFromDB();
-            }
-            else
-            {
-                await LoadFromAPI();
-            }
+                //TODO progress bar
+                //check if there is internet connection
+                networkService = new NetworkService();
 
-            //jumps from current block because there is no data loaded into
-            if (Countries.Count == 0)
-            {
-                return;
-            }
+                if (!networkService.CheckNetConnection())
+                {
+                    LoadFromDB();
+                    LblLoadFrom.Text = $"Data loaded from local DataBase on {DateTime.UtcNow}";
+                }
+                else
+                {
+                    await LoadFromAPI();
+                    LblLoadFrom.Text = $"Data loaded from API on {DateTime.UtcNow}";
+                }
 
-            //no errors found block goes on
-            CbCountry.ItemsSource = Countries;
-            CbCountry.DisplayMemberPath = "Name";
+                //jumps from current block because there is no data loaded into Countries
+                if (Countries.Count == 0)
+                {
+                    LblLoadFrom.Text = $"Error Loading Data. Try restarting..";
+                    return;
+                }
+
+                //no errors found block goes on
+                //adds the items from the list to a the dropdown list, displays the attribute Name from the list
+                CbCountry.ItemsSource = Countries;
+                CbCountry.DisplayMemberPath = "Name";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         /// <summary>
@@ -71,7 +84,7 @@
         /// </summary>
         private async void LoadFromDB()
         {
-            //SQL code goes here
+            throw new NotImplementedException("In Development");
         }
 
         /// <summary>
@@ -80,17 +93,29 @@
         /// <returns></returns>
         private async Task LoadFromAPI()
         {
-            apiConnection = new APIConnection();
+            try
+            {
+                apiConnection = new APIConnection();
 
-            //gets data from the API
-            var response = await apiConnection.GetApiData("http://restcountries.eu", "/rest/v2/all");
-            
-            Countries = (List<Country>)response.Result;
+                //gets data from the API
+                var response = await apiConnection.GetApiData("http://restcountries.eu", "/rest/v2/all");
 
-            //deletes existing data from the DB
-            //something here.....
-            //saves the new data in the DB
-            //something here ......
+                //if data is unsuccessfull for some reason(internet connection problems/api down)
+                if (!response.Success)
+                {
+                    throw new Exception(response.Answer);
+                }
+                //loads the result on to the Countries list 
+                Countries = (List<Country>)response.Result;
+                //deletes data on the DB 
+                dataService.DeleteData();
+                //saves new data on to DB
+                dataService.SaveData(Countries);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         /// <summary>
@@ -110,22 +135,25 @@
         /// <param name="e"></param>
         private void CbCountry_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var countriesTab = new CountryMainViewModel();
             var newTab = new ShowCountryDetails();
             try
             {
                 //gets the selected item from the comboBox
                 Country selected = (Country)CbCountry.SelectedItem;
-                //adds the selected item name(country) to the viewModel to be presented in tabName
-                countriesTab.Countries.Add(new CountryTabViewModel(selected.Name, newTab));
-                //defines the dataContext of this page ??????
+
+                newTab.CreateControl(selected);
+
+                //adds the selected item name(country) and the usercontrol page to the viewModel to be presented in the tab
+                CountryTab tab = new CountryTab(selected.Name, newTab);
+                countriesTab.AddTab(tab);
+
+                //defines the dataContext of this page ?????? maybe put this in XAML
                 DataContext = countriesTab;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-            
         }
     }
 }
