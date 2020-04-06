@@ -1,13 +1,7 @@
 ﻿namespace CountriesAPP.API_Models
 {
-    using SQLite;
-    using SQLiteNetExtensions.Attributes;
-
-    [Table("translations")]
     public class Translations
     {
-        [PrimaryKey, ForeignKey(typeof(Country))]
-        public string IdCountry { get; set; }
         public string De { get; set; }
         public string Es { get; set; }
         public string Fr { get; set; }

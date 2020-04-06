@@ -22,7 +22,7 @@
         private List<Country> Countries;
         CountryMainViewModel countriesTab;
         SQLService dataService;
-        //SQLiteService dbService;
+        private bool network = true;
         #endregion
 
         public MainWindow()
@@ -31,7 +31,6 @@
             countriesTab = new CountryMainViewModel();
             Countries = new List<Country>();
             dataService = new SQLService();
-            //dbService = new SQLiteService();
             LoadContent();
         }
 
@@ -54,6 +53,7 @@
                 {
                     LoadFromDB();
                     LblLoadFrom.Text = $"Data loaded from local DataBase on {DateTime.UtcNow}";
+                    network = false;
                 }
                 else
                 {
@@ -75,20 +75,20 @@
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message +"\n"+ ex.StackTrace);
             }
         }
 
         /// <summary>
         /// gets the data from the local DataBase
         /// </summary>
-        private async void LoadFromDB()
+        private void LoadFromDB()
         {
-            throw new NotImplementedException("In Development");
+            Countries = dataService.GetData();
         }
 
         /// <summary>
-        /// Downloads the API data 
+        /// Downloads the API data to a List 
         /// </summary>
         /// <returns></returns>
         private async Task LoadFromAPI()
@@ -119,7 +119,7 @@
         }
 
         /// <summary>
-        /// exit button
+        /// Exit button
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -136,11 +136,17 @@
         private void CbCountry_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var newTab = new ShowCountryDetails();
+            Country selected;
             try
             {
-                //gets the selected item from the comboBox
-                Country selected = (Country)CbCountry.SelectedItem;
+                selected = (Country)CbCountry.SelectedItem;
 
+                if (!network)
+                {
+                    selected = dataService.QueryCountry(selected.Alpha3Code);
+                }
+
+                //creates the UserControl
                 newTab.CreateControl(selected);
 
                 //adds the selected item name(country) and the usercontrol page to the viewModel to be presented in the tab
@@ -152,7 +158,7 @@
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message +"\n" + ex.StackTrace);
             }
         }
     }
