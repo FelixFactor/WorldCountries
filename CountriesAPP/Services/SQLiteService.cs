@@ -25,7 +25,7 @@
 
                 connection.CreateTable<Country>();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
             }

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
              xmlns:local="clr-namespace:CountriesAPP"
              mc:Ignorable="d" 
              d:DesignHeight="455" d:DesignWidth="900"
@@ -14,48 +15,114 @@
             TextOptions.TextFormattingMode="Ideal"
             TextOptions.TextRenderingMode="Auto"
             Background="{DynamicResource MaterialDesignPaper}">
-    <Grid>
+    <Grid DataContext="{Binding Countries}">
         <!--#region Grid Definitions-->
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <!--#endregion-->
-        <StackPanel Grid.Row="0" Background="WhiteSmoke">
-            <Image x:Name="ImgFlag" Margin="5,0,0,0" HorizontalAlignment="Left" Stretch="UniformToFill" Height="100" Width="170"/>
+        <!--#region Flag Image Row[0]-->
+        <StackPanel Grid.Row="0" Background="LightSlateGray" Orientation="Horizontal">
+            <Image Source="{Binding LocalFlag, Converter={svgc:SvgImageConverter}}" Margin="5,0,0,0" HorizontalAlignment="Left" Height="100" Width="170"/>
         </StackPanel>
+        <!--#endregion-->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Background="WhiteSmoke" TextBlock.Foreground="Black">
+            <!--#region Names-->
             <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding NativeName, StringFormat='Native Name: {0}'}" Margin="10"/>
+                <TextBlock Text="{Binding Demonym, StringFormat='Demonym: {0}'}" Margin="10"/>                
+                <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
+                    <TextBlock Text="Alt Spellings: "/>
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding AltSpellings}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel> 
+                <TextBlock Margin="10" Text="Translations"/>
+                <StackPanel Margin="15,0,0,0"> <!--Translations-->
+                    <TextBlock Text="{Binding Translations.De, StringFormat=German:  {0}}"/>
+                    <TextBlock Text="{Binding Translations.Es, StringFormat=Spanish:  {0}}" Background="LightGray"/>
+                    <TextBlock Text="{Binding Translations.Fr, StringFormat=French:  {0}}"/>
+                    <TextBlock Text="{Binding Translations.Ja, StringFormat=Japanese:  {0}}" Background="LightGray"/>
+                    <TextBlock Text="{Binding Translations.It, StringFormat=Italian:  {0}}"/>
+                    <TextBlock Text="{Binding Translations.Br, StringFormat=Brazilian:  {0}}" Background="LightGray"/>
+                    <TextBlock Text="{Binding Translations.Pt, StringFormat=Portuguese:  {0}}"/>
+                    <TextBlock Text="{Binding Translations.Nl, StringFormat=Dutch:  {0}}" Background="LightGray"/>
+                    <TextBlock Text="{Binding Translations.Hr, StringFormat=Croatian:  {0}}"/>
+                    <TextBlock Text="{Binding Translations.Fa, StringFormat=Farsi:  {0}}" Background="LightGray"/>
+                </StackPanel>
+            </StackPanel>
+            <!--#endregion-->
+            <!--#region Geography-->
+            <StackPanel Orientation="Vertical" Background="LightGray">
+                <TextBlock Text="{Binding Region, StringFormat='Region: {0}'}" Margin="10"/>
+                <TextBlock Text="{Binding Subregion, StringFormat='SubRegion: {0}'}" Margin="10"/>
+                <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
+                    <TextBlock Text="Lat/Long: "/>
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding Latlng}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel>
+                <TextBlock Text="{Binding Population, StringFormat='Population: {0}'}" Margin="10"/>                
+                <TextBlock Text="{Binding Capital, StringFormat='Capital: {0}'}" Margin="10"/>
+            <!--#endregion-->
+            <!--#region Languages-->
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Languages" Margin="10,10,0,0"/>
+                <StackPanel Orientation="Vertical" Margin="10">
+                    <ListView ItemsSource="{Binding Languages}" Foreground="Black">                        
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <WrapPanel>
+                                    <TextBlock Text="{Binding Iso639_2}"/>
+                                    <TextBlock Text="{Binding Name}" Margin="15,0,0,0"/>
+                                </WrapPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </StackPanel>
+            <!--#endregion-->
+            <!--#region Economy-->
+            <StackPanel Orientation="Vertical" Background="LightGray">
                 <TextBlock Margin="10">
-                <TextBlock Text="Capital: ">
-                    <TextBlock x:Name="LblCapital"/>
+                    <Hyperlink ToolTip="Represents the income or wealth distribution of a nation's residents, and is the most commonly used measurement of inequality.">?</Hyperlink>
+                    <TextBlock Text="{Binding Gini, StringFormat='Gini Index: {0}'}"/>                
                 </TextBlock>
-            </TextBlock>
+                <!--#region Currencies-->
             <TextBlock Margin="10">
-                <TextBlock Text="Region: ">
-                    <TextBlock x:Name="LblRegion"/>
-                </TextBlock>
+                <StackPanel>
+                <TextBlock Text="Currencies: "/>
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <ListView ItemsSource="{Binding Currencies}" Foreground="Black">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <WrapPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Name}"/>
+                                        <TextBlock Text="{Binding Symbol}" Margin="15,0,0,0"/>
+                                    </WrapPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </StackPanel>
             </TextBlock>
-            <TextBlock Margin="10">
-                <TextBlock Text="SubRegion: ">
-                    <TextBlock x:Name="LblSubRegion"/>
-                </TextBlock>
-            </TextBlock>
-            <TextBlock Margin="10">
-                <TextBlock Text="Population: ">
-                    <TextBlock x:Name="LblPop"/>
-                </TextBlock>
-            </TextBlock>
-            <TextBlock Margin="10">
-                <Hyperlink ToolTip="Represents the income or wealth distribution of a nation's residents, and is the most commonly used measurement of inequality.">?</Hyperlink>
-                <TextBlock Text="Gini Index: ">
-                    <TextBlock x:Name="LblGini"/>
-                </TextBlock>
-            </TextBlock>
+                <!--#endregion-->
             </StackPanel>
-            <StackPanel Orientation="Vertical" Margin="10">
-                <TextBlock Text="hello"/>
-            </StackPanel>
+            <!--#endregion-->
         </StackPanel>
     </Grid>
 </UserControl>

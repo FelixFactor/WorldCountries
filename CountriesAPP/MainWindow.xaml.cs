@@ -20,8 +20,8 @@
         private NetworkService networkService;
         private APIConnection apiConnection;
         private List<Country> Countries;
-        CountryMainViewModel countriesTab;
-        SQLService dataService;
+        private CountryMainViewModel countriesTab;
+        private SQLService dataService;
         private bool network = true;
         #endregion
 
@@ -48,8 +48,8 @@
                 //TODO progress bar
                 //check if there is internet connection
                 networkService = new NetworkService();
-
-                if (!networkService.CheckNetConnection())
+                //TODO true for testing
+                if (networkService.CheckNetConnection())
                 {
                     LoadFromDB();
                     LblLoadFrom.Text = $"Data loaded from local DataBase on {DateTime.UtcNow}";
@@ -75,12 +75,12 @@
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message +"\n"+ ex.StackTrace);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
             }
         }
 
         /// <summary>
-        /// gets the data from the local DataBase
+        /// loads the data from the local DataBase
         /// </summary>
         private void LoadFromDB()
         {
@@ -110,6 +110,8 @@
                 //deletes data on the DB 
                 dataService.DeleteData();
                 //saves new data on to DB
+                //this turns an asynchronous method on and finishes the loading before data is saved!
+                //TODO testing required to understand final results from async method
                 dataService.SaveData(Countries);
             }
             catch (Exception ex)
@@ -135,7 +137,6 @@
         /// <param name="e"></param>
         private void CbCountry_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var newTab = new ShowCountryDetails();
             Country selected;
             try
             {
@@ -147,18 +148,18 @@
                 }
 
                 //creates the UserControl
-                newTab.CreateControl(selected);
-
+                var newTab = new ShowCountryDetails(selected);
+                
                 //adds the selected item name(country) and the usercontrol page to the viewModel to be presented in the tab
                 CountryTab tab = new CountryTab(selected.Name, newTab);
                 countriesTab.AddTab(tab);
 
-                //defines the dataContext of this page ?????? maybe put this in XAML
+                //defines the dataContext of this page
                 DataContext = countriesTab;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message +"\n" + ex.StackTrace);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
             }
         }
     }

@@ -17,7 +17,7 @@
         private SQLiteConnection sqlConnection;
         private List<string> SQLCmds = new List<string>();
         private Country query = new Country();
-
+        
         /// <summary>
         /// constructor that generates the data directory,
         /// creates the tables to hold data from API service
@@ -85,7 +85,7 @@
         public async void SaveData(List<Country> Countries)
         {
             await DownloadFlags(Countries);
-            
+
             SeparateCurrencies(Countries);
             SeparateRegionalBloc(Countries);
             SeparateLanguage(Countries);
@@ -100,7 +100,7 @@
         {
             string latlng = string.Empty, borders = string.Empty, topLevelDomain = string.Empty, callingCodes = string.Empty, timezones = string.Empty, altSpellings = string.Empty;
 
-            string insertCmd = "INSERT INTO country VALUES(@alpha3Code, @name, @alpha2Code, @capital, @region, @subRegion, @population, @denonym, @area, @gini, @nativeName, @numericCode, @flag, @cioc, @latlong, @borders, @topLevelDomain, @callingCodes, @timezones, @altSpellings)";
+            string insertCmd = "INSERT INTO country VALUES(@alpha3Code, @name, @alpha2Code, @capital, @region, @subRegion, @population, @demonym, @area, @gini, @nativeName, @numericCode, @flag, @cioc, @latlong, @borders, @topLevelDomain, @callingCodes, @timezones, @altSpellings)";
 
             try
             {
@@ -153,7 +153,7 @@
                     command.Parameters.AddWithValue("@region", country.Region);
                     command.Parameters.AddWithValue("@subRegion", country.Subregion);
                     command.Parameters.AddWithValue("@population", country.Population);
-                    command.Parameters.AddWithValue("@denonym", country.Demonym);
+                    command.Parameters.AddWithValue("@demonym", country.Demonym);
                     command.Parameters.AddWithValue("@area", country.Area);
                     command.Parameters.AddWithValue("@gini", country.Gini);
                     command.Parameters.AddWithValue("@nativeName", country.NativeName);
@@ -193,7 +193,7 @@
         /// <returns></returns>
         public Country QueryCountry(string alpha3Code)
         {
-            string selectCmd = "SELECT alpha3Code, name, alpha2Code, capital, region, subRegion, population, denonym, area, giniIndex, nativeName, numericCode, cioc, latlong, borders, topLevelDomain, callingCodes, timezones, altSpellings " +
+            string selectCmd = "SELECT alpha3Code, name, alpha2Code, capital, region, subRegion, population, demonym, area, giniIndex, nativeName, numericCode, cioc, latlong, borders, topLevelDomain, callingCodes, timezones, altSpellings " +
                                "FROM country " +
                                "WHERE alpha3code like @alpha3Code";
 
@@ -213,7 +213,7 @@
                 query.Region = (string)result["region"];
                 query.Subregion = (string)result["subRegion"];
                 query.Population = (int)result["population"];
-                query.Demonym = (string)result["denonym"];
+                query.Demonym = (string)result["demonym"];
                 query.Area = (double)result["area"];
                 query.Gini = (double)result["giniIndex"];
                 query.NativeName = (string)result["nativeName"];
@@ -616,16 +616,19 @@
         /// <returns></returns>
         private async Task DownloadFlags(List<Country> Countries)
         {
+            //TODO check if files exist to not download them all again
             WebClient client = new WebClient();
 
             if (!Directory.Exists("LocalFlags"))
             {
                 Directory.CreateDirectory("LocalFlags");
             }
-
+            
             foreach (Country country in Countries)
             {
-                await client.DownloadFileTaskAsync(country.Flag, $"LocalFlags/{country.Alpha3Code}.svg");
+                string path = $"LocalFlags/{country.Alpha3Code}.svg";
+
+                await client.DownloadFileTaskAsync(country.Flag, path);
             }
         }
 
@@ -664,7 +667,7 @@
 
             SQLCmds.Add("CREATE TABLE IF NOT EXISTS country" +
                            "(alpha3Code CHAR(3) PRIMARY KEY,name VARCHAR NULL,alpha2Code CHAR(2) NULL,capital VARCHAR NULL," +
-                           "region VARCHAR NULL,subregion VARCHAR NULL,population INT NULL,denonym VARCHAR NULL,area FLOAT NULL,giniIndex FLOAT NULL," +
+                           "region VARCHAR NULL,subregion VARCHAR NULL,population INT NULL,demonym VARCHAR NULL,area FLOAT NULL,giniIndex FLOAT NULL," +
                            "nativeName VARCHAR NULL,numericCode VARCHAR NULL,flag VARCHAR NULL,cioc CHAR(3) NULL,latlong VARCHAR NULL,borders VARCHAR NULL," +
                            "topLevelDomain VARCHAR NULL,callingCodes VARCHAR NULL,timezones VARCHAR NULL, altSpellings VARCHAR NULL)");
             SQLCmds.Add("CREATE TABLE IF NOT EXISTS currency(code CHAR(3) PRIMARY KEY,name VARCHAR NULL,symbol CHAR(5) NULL)");
@@ -722,7 +725,7 @@
         /// <returns>A list of strings</returns>
         private List<string> StringConcatToList(string items)
         {
-            List<string>  stuff = new List<string>();
+            List<string> stuff = new List<string>();
             string[] splitted = items.Split(',');
             foreach (string item in splitted)
             {
