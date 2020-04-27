@@ -53,6 +53,6 @@
 
         public string Cioc { get; set; }
 
-        public string LocalFlag { get { return $"LocalFlags/{Alpha3Code}.svg"; } }
+        public string LocalFlag { get { return $"Data/LocalFlags/{Alpha3Code}.svg"; } }
     }
 }

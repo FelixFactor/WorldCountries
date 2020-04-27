@@ -9,7 +9,7 @@
     {
         public Tab()
         {
-            CloseCommand = new ActionCommand(p => CloseRequest?.Invoke(this, EventArgs.Empty));
+            CloseCommand = new ActionCommand(p => CloseRequest?.Invoke(this, EventArgs.Empty));            
         }
 
         public string TabName { get; set; }
