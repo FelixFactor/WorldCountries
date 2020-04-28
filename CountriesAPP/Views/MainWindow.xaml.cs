@@ -2,12 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.IO;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Threading;
     using API_Models;
+    using CountriesAPP.Models;
     using Models;
     using Services;
     using ViewModels;
@@ -34,6 +36,7 @@
             countriesTab = new CountryMainViewModel();
             Countries = new List<Country>();
             dataService = new SQLService();
+            DataContext = countriesTab;
             LoadContent();
         }
 
@@ -49,6 +52,7 @@
             try
             {
                 LoadingBar.Value = 0;
+                
                 //check if there is internet connection
                 networkService = new NetworkService();
                 //TODO true for testing
@@ -70,23 +74,20 @@
                     LblLoadFrom.Text = $"Error Loading Data. Try restarting..";
                     return;
                 }
-
-                //no errors found block goes on
+                               
                 //adds the items from the list to a the dropdown list, displays the attribute Name from the list
                 CbCountry.ItemsSource = Countries;
                 CbCountry.DisplayMemberPath = "Name";
 
+                LoadingBar.Value = 100;
+
+                LblLoadSave.Text = "Data Loaded";
+
                 //when connected to the internet saves/updates data in DB
                 if (network)
                 {
-                    LoadingBar.IsIndeterminate = true;
-
                     await CheckLastUpdate();
-
-                    LoadingBar.IsIndeterminate = false;
                 }
-
-                LoadingBar.Value = 100;
             }
             catch (Exception ex)
             {
@@ -120,7 +121,15 @@
             if (DateTime.Now.Subtract(lastUpdate).TotalDays > 2)
             {
                 await SaveDataToSql(Countries);
+
+                File.WriteAllText(path, DateTime.Now.ToString("dd-MM-yyyy"));
             }
+            
+            await Task.Delay(5000);
+
+            LblLoadSave.Visibility = Visibility.Hidden;
+            LoadingBar.Visibility = Visibility.Hidden;
+            ProgressText.Visibility = Visibility.Hidden;
         }
 
         /// <summary>
@@ -133,16 +142,36 @@
         {
             try
             {
+                await Task.Delay(5000);
                 //deletes data on the DB 
                 dataService.DeleteData();
 
+                Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
+                progress.ProgressChanged += UpdateProgress;
+
+                LoadingBar.Value = 0;
+                LblLoadSave.Visibility = Visibility.Visible;
+                LblLoadSave.Text = "Saving to DataBase";
                 //saves new data on to DB               
-                await Task.WhenAll(dataService.SaveData(Countries));
+                await dataService.SaveData(Countries, progress);
+
+                LblLoadSave.Text = "All tables in Database updated";
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// kicks the event that progresses the bar!
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateProgress(object sender, ProgressReportModel e)
+        {
+            LoadingBar.Value = e.CompletedPercent;
+            LblLoadSave.Text = $"{e.ItemName}";
         }
 
         /// <summary>
@@ -212,11 +241,10 @@
 
                 //adds the selected item name(country) and the usercontrol page to the viewModel to be presented in the tab
                 CountryTab tab = new CountryTab(selected.Name, newTab);
-                countriesTab.AddTab(tab);
-                CountryTabs.SelectedItem = tab;
 
-                //defines the dataContext of this page
-                DataContext = countriesTab;
+                countriesTab.AddTab(tab);
+
+                CountryTabs.SelectedItem = tab;
             }
             catch (Exception ex)
             {
