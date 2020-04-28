@@ -1,7 +1,5 @@
 ﻿namespace CountriesAPP.Services
 {
-    using API_Models;
-    using MyToolkit.Utilities;
     using System;
     using System.Collections.Generic;
     using System.Data.SQLite;
@@ -10,16 +8,24 @@
     using System.Net;
     using System.Threading.Tasks;
     using System.Windows;
-
+    using API_Models;
+    using Models;
+    using MyToolkit.Utilities;
+    
     public class SQLService
     {
+        #region Attributes
         private SQLiteCommand command;
         private SQLiteConnection sqlConnection;
         private List<string> SQLCmds = new List<string>();
         private Country query = new Country();
-        
+        private readonly ProgressReportModel Report = new ProgressReportModel();
+        private IProgress<ProgressReportModel> Progress = new Progress<ProgressReportModel>();
+        private int saved;
+        #endregion
+
         /// <summary>
-        /// constructor that generates the data directory,
+        /// generates the data directory,
         /// creates the tables to hold data from API service
         /// </summary>
         public SQLService()
@@ -80,113 +86,6 @@
         }
 
         /// <summary>
-        /// Saves data to SQL DB
-        /// </summary>
-        public async void SaveData(List<Country> Countries)
-        {
-            await DownloadFlags(Countries);
-
-            SeparateCurrencies(Countries);
-            SeparateRegionalBloc(Countries);
-            SeparateLanguage(Countries);
-            SaveCountries(Countries);
-        }
-
-        /// <summary>
-        /// Saves data to the country table in SQL
-        /// </summary>
-        /// <param name="countries"></param>
-        private void SaveCountries(List<Country> countries)
-        {
-            string latlng = string.Empty, borders = string.Empty, topLevelDomain = string.Empty, callingCodes = string.Empty, timezones = string.Empty, altSpellings = string.Empty;
-
-            string insertCmd = "INSERT INTO country VALUES(@alpha3Code, @name, @alpha2Code, @capital, @region, @subRegion, @population, @demonym, @area, @gini, @nativeName, @numericCode, @flag, @cioc, @latlong, @borders, @topLevelDomain, @callingCodes, @timezones, @altSpellings)";
-
-            try
-            {
-                foreach (Country country in countries)
-                {
-                    SaveTranslations(country.Translations, country.Alpha3Code);
-                    SaveCountry_currency(country);
-                    SaveCountry_regionalBloc(country);
-                    SaveCountry_language(country);
-
-                    command = new SQLiteCommand(insertCmd, sqlConnection);
-
-                    #region Concatenate Strings
-                    //list of borders
-                    foreach (string border in country.Borders)
-                    {
-                        borders += $"{border},";
-                    }
-                    //list of latitude - longitude
-                    foreach (double coord in country.Latlng)
-                    {
-                        latlng += $"{coord},";
-                    }
-                    //list of Internet Domain
-                    foreach (string domain in country.TopLevelDomain)
-                    {
-                        topLevelDomain += $"{domain},";
-                    }
-                    //list of telephone international codes
-                    foreach (string phone in country.CallingCodes)
-                    {
-                        callingCodes += $"{phone},";
-                    }
-                    //list of alternative country name spellings
-                    foreach (string alt in country.AltSpellings)
-                    {
-                        altSpellings += $"{alt},";
-                    }
-                    //list of timezones
-                    foreach (string time in country.Timezones)
-                    {
-                        timezones += $"{time},";
-                    }
-                    #endregion
-                    #region Parameters and Values
-                    command.Parameters.AddWithValue("@alpha3Code", country.Alpha3Code);
-                    command.Parameters.AddWithValue("@name", country.Name);
-                    command.Parameters.AddWithValue("@alpha2Code", country.Alpha2Code);
-                    command.Parameters.AddWithValue("@capital", country.Capital);
-                    command.Parameters.AddWithValue("@region", country.Region);
-                    command.Parameters.AddWithValue("@subRegion", country.Subregion);
-                    command.Parameters.AddWithValue("@population", country.Population);
-                    command.Parameters.AddWithValue("@demonym", country.Demonym);
-                    command.Parameters.AddWithValue("@area", country.Area);
-                    command.Parameters.AddWithValue("@gini", country.Gini);
-                    command.Parameters.AddWithValue("@nativeName", country.NativeName);
-                    command.Parameters.AddWithValue("@numericCode", country.NumericCode);
-                    command.Parameters.AddWithValue("@flag", country.Flag);
-                    command.Parameters.AddWithValue("@cioc", country.Cioc);
-                    command.Parameters.AddWithValue("@latlong", latlng);
-                    command.Parameters.AddWithValue("@borders", borders);
-                    command.Parameters.AddWithValue("@topLevelDomain", topLevelDomain);
-                    command.Parameters.AddWithValue("@callingCodes", callingCodes);
-                    command.Parameters.AddWithValue("@timezones", timezones);
-                    command.Parameters.AddWithValue("@altSpellings", altSpellings);
-                    #endregion
-
-                    command.ExecuteNonQuery();
-
-                    #region Empty Strings
-                    latlng = string.Empty;
-                    borders = string.Empty;
-                    topLevelDomain = string.Empty;
-                    callingCodes = string.Empty;
-                    timezones = string.Empty;
-                    altSpellings = string.Empty;
-                    #endregion
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
-            }
-        }
-
-        /// <summary>
         /// Queries the DB for the selected country
         /// </summary>
         /// <param name="alpha3Code"></param>
@@ -213,12 +112,12 @@
                 query.Region = (string)result["region"];
                 query.Subregion = (string)result["subRegion"];
                 query.Population = (int)result["population"];
-                query.Demonym = (string)result["demonym"];
+                query.Demonym = result["demonym"].ToString();
                 query.Area = (double)result["area"];
                 query.Gini = (double)result["giniIndex"];
                 query.NativeName = (string)result["nativeName"];
-                query.NumericCode = (string)result["numericCode"];
-                query.Cioc = (string)result["cioc"];
+                query.NumericCode = result["numericCode"].ToString();
+                query.Cioc = result["cioc"].ToString();
                 query.Latlng = DoubleConcatToList((string)result["latlong"]);
                 query.Borders = StringConcatToList((string)result["borders"]);
                 query.TopLevelDomain = StringConcatToList((string)result["topLevelDomain"]);
@@ -278,16 +177,16 @@
             query.Translations = new Translations();
             while (result.Read())
             {
-                query.Translations.De = (string)result["de"];
-                query.Translations.Es = (string)result["es"];
-                query.Translations.Fr = (string)result["fr"];
-                query.Translations.Ja = (string)result["ja"];
-                query.Translations.It = (string)result["it"];
-                query.Translations.Br = (string)result["br"];
-                query.Translations.Pt = (string)result["pt"];
-                query.Translations.Nl = (string)result["nl"];
-                query.Translations.Hr = (string)result["hr"];
-                query.Translations.Fa = (string)result["fa"];
+                query.Translations.De = (string)result["de"].ToString();
+                query.Translations.Es = (string)result["es"].ToString();
+                query.Translations.Fr = (string)result["fr"].ToString();
+                query.Translations.Ja = (string)result["ja"].ToString();
+                query.Translations.It = (string)result["it"].ToString();
+                query.Translations.Br = (string)result["br"].ToString();
+                query.Translations.Pt = (string)result["pt"].ToString();
+                query.Translations.Nl = (string)result["nl"].ToString();
+                query.Translations.Hr = (string)result["hr"].ToString();
+                query.Translations.Fa = (string)result["fa"].ToString();
             }
         }
 
@@ -335,10 +234,136 @@
             {
                 query.Currencies.Add(new Currency
                 {
-                    Code = (string)result["code"],
-                    Name = (string)result["name"],
-                    Symbol = (string)result["symbol"]
+                    Code = (string)result["code"].ToString(),
+                    Name = (string)result["name"].ToString(),
+                    Symbol = (string)result["symbol"].ToString()
                 });
+            }
+        }
+
+
+        /// <summary>
+        /// Saves data to SQL DB
+        /// </summary>
+        public async Task SaveData(List<Country> Countries, IProgress<ProgressReportModel> progress)
+        {
+            Progress = progress;
+
+            await DownloadFlags(Countries);
+
+            await SeparateCurrencies(Countries);
+
+            await SeparateRegionalBloc(Countries);
+
+            await SeparateLanguage(Countries);
+
+            await SaveCountries(Countries);
+        }
+
+        /// <summary>
+        /// Saves data to the country table in SQL
+        /// </summary>
+        /// <param name="countries"></param>
+        private async Task SaveCountries(List<Country> countries)
+        {
+            string latlng = string.Empty, borders = string.Empty, topLevelDomain = string.Empty, callingCodes = string.Empty, timezones = string.Empty, altSpellings = string.Empty;
+
+            string insertCmd = "INSERT INTO country VALUES(@alpha3Code, @name, @alpha2Code, @capital, @region, @subRegion, @population, @demonym, @area, @gini, @nativeName, @numericCode, @flag, @cioc, @latlong, @borders, @topLevelDomain, @callingCodes, @timezones, @altSpellings)";
+
+            saved = 0;
+            try
+            {
+                await Task.Run(() =>
+                {
+                    foreach (Country country in countries)
+                    {
+                        SaveTranslations(country.Translations, country.Alpha3Code);
+                        SaveCountry_currency(country);
+                        SaveCountry_regionalBloc(country);
+                        SaveCountry_language(country);
+
+                        command = new SQLiteCommand(insertCmd, sqlConnection);
+
+                        #region Concatenate Strings
+                        //list of borders
+                        foreach (string border in country.Borders)
+                        {
+                            borders += $"{border},";
+                        }
+                        //list of latitude - longitude
+                        foreach (double coord in country.Latlng)
+                        {
+                            latlng += $"{coord},";
+                        }
+                        //list of Internet Domain
+                        foreach (string domain in country.TopLevelDomain)
+                        {
+                            topLevelDomain += $"{domain},";
+                        }
+                        //list of telephone international codes
+                        foreach (string phone in country.CallingCodes)
+                        {
+                            callingCodes += $"{phone},";
+                        }
+                        //list of alternative country name spellings
+                        foreach (string alt in country.AltSpellings)
+                        {
+                            altSpellings += $"{alt},";
+                        }
+                        //list of timezones
+                        foreach (string time in country.Timezones)
+                        {
+                            timezones += $"{time},";
+                        }
+                        #endregion
+                        #region Parameters and Values
+                        command.Parameters.AddWithValue("@alpha3Code", country.Alpha3Code);
+                        command.Parameters.AddWithValue("@name", country.Name);
+                        command.Parameters.AddWithValue("@alpha2Code", country.Alpha2Code);
+                        command.Parameters.AddWithValue("@capital", country.Capital);
+                        command.Parameters.AddWithValue("@region", country.Region);
+                        command.Parameters.AddWithValue("@subRegion", country.Subregion);
+                        command.Parameters.AddWithValue("@population", country.Population);
+                        command.Parameters.AddWithValue("@demonym", country.Demonym);
+                        command.Parameters.AddWithValue("@area", country.Area);
+                        command.Parameters.AddWithValue("@gini", country.Gini);
+                        command.Parameters.AddWithValue("@nativeName", country.NativeName);
+                        command.Parameters.AddWithValue("@numericCode", country.NumericCode);
+                        command.Parameters.AddWithValue("@flag", country.Flag);
+                        command.Parameters.AddWithValue("@cioc", country.Cioc);
+                        command.Parameters.AddWithValue("@latlong", latlng);
+                        command.Parameters.AddWithValue("@borders", borders);
+                        command.Parameters.AddWithValue("@topLevelDomain", topLevelDomain);
+                        command.Parameters.AddWithValue("@callingCodes", callingCodes);
+                        command.Parameters.AddWithValue("@timezones", timezones);
+                        command.Parameters.AddWithValue("@altSpellings", altSpellings);
+                        #endregion
+
+                        command.ExecuteNonQuery();
+
+                        #region Progress Bar
+                        saved++;
+
+                        Report.CompletedPercent = (saved * 100) / countries.Count;
+                        Report.ItemName = $"Updating Country: {country.Name}";
+
+                        Progress.Report(Report);
+                        #endregion
+
+                        #region Empty Strings
+                        latlng = string.Empty;
+                        borders = string.Empty;
+                        topLevelDomain = string.Empty;
+                        callingCodes = string.Empty;
+                        timezones = string.Empty;
+                        altSpellings = string.Empty;
+                        #endregion
+                    }
+                });                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);                
             }
         }
 
@@ -346,7 +371,7 @@
         /// Inserts values into mid table country_language
         /// </summary>
         /// <param name="country">alpha3Code, iso639_2</param>
-        private void SaveCountry_language(Country country)
+        private async Task SaveCountry_language(Country country)
         {
             string insertCmd = "INSERT INTO country_language VALUES(@idCountry, @idLang)";
 
@@ -359,7 +384,7 @@
                 command.Parameters.AddWithValue("@idLang", lang.Iso639_2);
                 #endregion
 
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();
             }
         }
 
@@ -367,7 +392,7 @@
         /// Inserts values into mid table country_regionalBloc
         /// </summary>
         /// <param name="country">alpha3Code, acronym</param>
-        private void SaveCountry_regionalBloc(Country country)
+        private async Task SaveCountry_regionalBloc(Country country)
         {
             string insertCmd = "INSERT INTO country_regionalBloc VALUES(@idCountry, @idBloc)";
 
@@ -380,7 +405,7 @@
                 command.Parameters.AddWithValue("@idBloc", bloc.Acronym);
                 #endregion
 
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();
             }
         }
 
@@ -388,7 +413,7 @@
         /// Inserts values in mid table country_currency
         /// </summary>
         /// <param name="country">alpha3Code, code</param>
-        private void SaveCountry_currency(Country country)
+        private async Task SaveCountry_currency(Country country)
         {
             string insertCmd = "INSERT INTO country_currency VALUES(@idCountry, @idCurrency)";
 
@@ -401,7 +426,7 @@
                 command.Parameters.AddWithValue("@idCurrency", currency.Code);
                 #endregion
 
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();
             }
         }
 
@@ -411,23 +436,24 @@
         /// Saves the list to DB
         /// </summary>
         /// <param name="countries"></param>
-        private void SeparateLanguage(List<Country> countries)
+        private async Task SeparateLanguage(List<Country> countries)
         {
             List<Language> Langs = new List<Language>();
 
-            foreach (Country item in countries)
+            await Task.Run(() =>
             {
-                foreach (Language lang in item.Languages)
+                foreach (Country item in countries)
                 {
-                    Langs.Add(lang);
+                    foreach (Language lang in item.Languages)
+                    {
+                        Langs.Add(lang);
+                    }
                 }
-            }
+                var distinct = Langs.DistinctBy(b => b.Iso639_2).ToList();
 
-            var distinct = Langs.DistinctBy(b => b.Iso639_2).ToList();
-
-            Langs = distinct;
-
-            SaveLanguage(Langs);
+                Langs = distinct;
+            });
+            await SaveLanguage(Langs);
         }
 
         /// <summary>
@@ -436,23 +462,24 @@
         /// Saves the list to DB
         /// </summary>
         /// <param name="countries"></param>
-        private void SeparateRegionalBloc(List<Country> countries)
+        private async Task SeparateRegionalBloc(List<Country> countries)
         {
             List<Regionalbloc> Blocs = new List<Regionalbloc>();
 
-            foreach (Country item in countries)
+            await Task.Run(() =>
             {
-                foreach (Regionalbloc bloc in item.RegionalBlocs)
+                foreach (Country item in countries)
                 {
-                    Blocs.Add(bloc);
+                    foreach (Regionalbloc bloc in item.RegionalBlocs)
+                    {
+                        Blocs.Add(bloc);
+                    }
                 }
-            }
+                var distinct = Blocs.DistinctBy(b => b.Acronym).ToList();
 
-            var distinct = Blocs.DistinctBy(b => b.Acronym).ToList();
-
-            Blocs = distinct;
-
-            SaveRegionalBloc(Blocs);
+                Blocs = distinct;
+            });
+            await SaveRegionalBloc(Blocs);
         }
 
         /// <summary>
@@ -461,71 +488,93 @@
         /// Saves the list to DB
         /// </summary>
         /// <param name="countries"></param>
-        private void SeparateCurrencies(List<Country> countries)
+        private async Task SeparateCurrencies(List<Country> countries)
         {
             List<Currency> Currencies = new List<Currency>();
 
-            foreach (Country item in countries)
+            await Task.Run(() =>
             {
-                foreach (Currency currency in item.Currencies)
+                foreach (Country item in countries)
                 {
-                    Currencies.Add(currency);
+                    foreach (Currency currency in item.Currencies)
+                    {
+                        Currencies.Add(currency);
+                    }
                 }
-            }
+                var distinc = Currencies.DistinctBy(c => c.Code).ToList();
 
-            var distinc = Currencies.DistinctBy(c => c.Code).ToList();
+                Currencies = distinc;
 
-            Currencies = distinc;
-
-            SaveCurrency(Currencies);
+            });
+            await SaveCurrency(Currencies);
         }
 
         /// <summary>
         /// Saves DISTINCT data from SeparateRegionalBloc function to the regionalBloc table in SQL
         /// </summary>
         /// <param name="countries"></param>
-        private void SaveRegionalBloc(List<Regionalbloc> regionalbloc)
+        private async Task SaveRegionalBloc(List<Regionalbloc> regionalbloc)
         {
             string insertCmd = "INSERT INTO regionalBloc VALUES(@acronym, @name, @otherAcronym, @otherNames)";
 
             string otherAcronym = string.Empty, otherNames = string.Empty;
-
-            //regional bloc
-            foreach (Regionalbloc bloc in regionalbloc)
+            try
             {
-                command = new SQLiteCommand(insertCmd, sqlConnection);
-
-                #region Concatenate Strings
-                //list of otherAcronyms
-                foreach (string other in bloc.OtherAcronyms)
+                saved = 0;
+                await Task.Run(() =>
                 {
-                    otherAcronym += $"{other},";
-                }
-                //List of otherNames
-                foreach (string other in bloc.OtherNames)
-                {
-                    otherNames += $"{other},";
-                }
-                #endregion
-                #region Parameters & Values
-                command.Parameters.AddWithValue("@acronym", bloc.Acronym);
-                command.Parameters.AddWithValue("@name", bloc.Name);
-                command.Parameters.AddWithValue("@otherAcronym", otherAcronym);
-                command.Parameters.AddWithValue("@otherNames", otherNames);
-                #endregion
+                    foreach (Regionalbloc bloc in regionalbloc)
+                    {
+                        command = new SQLiteCommand(insertCmd, sqlConnection);
 
-                command.ExecuteNonQuery();
+                        #region Concatenate Strings
+                        //list of otherAcronyms
+                        foreach (string other in bloc.OtherAcronyms)
+                        {
+                            otherAcronym += $"{other},";
+                        }
+                        //List of otherNames
+                        foreach (string other in bloc.OtherNames)
+                        {
+                            otherNames += $"{other},";
+                        }
+                        #endregion
+                        #region Parameters & Values
+                        command.Parameters.AddWithValue("@acronym", bloc.Acronym);
+                        command.Parameters.AddWithValue("@name", bloc.Name);
+                        command.Parameters.AddWithValue("@otherAcronym", otherAcronym);
+                        command.Parameters.AddWithValue("@otherNames", otherNames);
+                        #endregion
 
-                otherAcronym = string.Empty;
-                otherNames = string.Empty;
+                        command.ExecuteNonQuery();
+
+                        #region Progress Bar
+                        saved++;
+
+                        Report.CompletedPercent = (saved * 100) / regionalbloc.Count;
+                        Report.ItemName = $"Updating Economic Group: {bloc.Name}";
+
+                        Progress.Report(Report);
+                        #endregion
+
+                        otherAcronym = string.Empty;
+                        otherNames = string.Empty;
+                    }
+                });
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+            }
+            //regional bloc
+            
         }
 
         /// <summary>
         /// Saves data to the translations table in SQL
         /// </summary>
         /// <param name="countries"></param>
-        private void SaveTranslations(Translations language, string a3c)
+        private async Task SaveTranslations(Translations language, string a3c)
         {
             string insertCmd = "INSERT INTO translations VALUES(@alpha3Code, @de, @es, @fr, @ja, @it, @br, @pt, @nl, @hr, @fa)";
             try
@@ -546,7 +595,7 @@
                 command.Parameters.AddWithValue("@alpha3Code", a3c);
                 #endregion
 
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();                
             }
             catch (Exception ex)
             {
@@ -558,23 +607,37 @@
         /// Saves DISTINCT data from SeparateLanguage function to the language table in SQL
         /// </summary>
         /// <param name="countries"></param>
-        private void SaveLanguage(List<Language> languages)
+        private async Task SaveLanguage(List<Language> languages)
         {
             string insertCmd = "INSERT INTO language VALUES(@iso639_2, @iso639_1, @name, @nativeLanguageName)";
             try
             {
                 command = new SQLiteCommand(insertCmd, sqlConnection);
-                foreach (Language language in languages)
-                {
-                    #region Parameters & Values
-                    command.Parameters.AddWithValue("@iso639_2", language.Iso639_2);
-                    command.Parameters.AddWithValue("@iso639_1", language.Iso639_1);
-                    command.Parameters.AddWithValue("@name", language.Name);
-                    command.Parameters.AddWithValue("@nativeLanguageName", language.NativeName);
-                    #endregion
 
-                    command.ExecuteNonQuery();
-                }
+                saved = 0;
+                await Task.Run(() =>
+                {
+                    foreach (Language language in languages)
+                    {
+                        #region Parameters & Values
+                        command.Parameters.AddWithValue("@iso639_2", language.Iso639_2);
+                        command.Parameters.AddWithValue("@iso639_1", language.Iso639_1);
+                        command.Parameters.AddWithValue("@name", language.Name);
+                        command.Parameters.AddWithValue("@nativeLanguageName", language.NativeName);
+                        #endregion
+
+                        command.ExecuteNonQuery();
+
+                        #region Progress Bar
+                        saved++;
+
+                        Report.CompletedPercent = (saved * 100) / languages.Count;
+                        Report.ItemName = $"Updating Language: {language.Name}";
+
+                        Progress.Report(Report);
+                        #endregion
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -586,22 +649,36 @@
         /// Saves DISTINCT data from SeparateCurrencies function to the currency table in SQL
         /// </summary>
         /// <param name="countries"></param>
-        private void SaveCurrency(List<Currency> currencies)
+        private async Task SaveCurrency(List<Currency> currencies)
         {
             string insertCmd = "INSERT INTO currency VALUES(@code, @name, @symbol)";
             try
             {
                 command = new SQLiteCommand(insertCmd, sqlConnection);
-                foreach (Currency currency in currencies)
-                {
-                    #region Parameters & Values
-                    command.Parameters.AddWithValue("@code", currency.Code);
-                    command.Parameters.AddWithValue("@name", currency.Name);
-                    command.Parameters.AddWithValue("@symbol", currency.Symbol);
-                    #endregion
 
-                    command.ExecuteNonQuery();
-                }
+                saved = 0;
+                await Task.Run(() =>
+                {
+                    foreach (Currency currency in currencies)
+                    {
+                        #region Parameters & Values
+                        command.Parameters.AddWithValue("@code", currency.Code);
+                        command.Parameters.AddWithValue("@name", currency.Name);
+                        command.Parameters.AddWithValue("@symbol", currency.Symbol);
+                        #endregion
+
+                        command.ExecuteNonQuery();
+
+                        #region Progress Bar
+                        saved++;
+
+                        Report.CompletedPercent = (saved * 100) / currencies.Count;
+                        Report.ItemName = $"Updating Currency: {currency.Name}";
+
+                        Progress.Report(Report);
+                        #endregion
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -610,26 +687,39 @@
         }
 
         /// <summary>
-        /// flags async download format SVG
+        /// async downloads flags in SVG format
         /// </summary>
         /// <param name="Countries"></param>
         /// <returns></returns>
-        private async Task DownloadFlags(List<Country> Countries)
+        private async Task DownloadFlags(List<Country> countries)
         {
             //TODO check if files exist to not download them all again
             WebClient client = new WebClient();
 
-            if (!Directory.Exists("LocalFlags"))
+            if (!Directory.Exists("Data/LocalFlags"))
             {
-                Directory.CreateDirectory("LocalFlags");
+                Directory.CreateDirectory("Data/LocalFlags");
             }
-            
-            foreach (Country country in Countries)
-            {
-                string path = $"LocalFlags/{country.Alpha3Code}.svg";
 
-                await client.DownloadFileTaskAsync(country.Flag, path);
-            }
+            saved = 0;
+            await Task.Run(() =>
+            {
+                foreach (Country country in countries)
+                {
+                    string path = $"Data/LocalFlags/{country.Alpha3Code}.svg";
+
+                    client.DownloadFile(country.Flag, path);
+
+                    #region Progress Bar
+                    saved++;
+
+                    Report.CompletedPercent = (saved * 100) / countries.Count;
+                    Report.ItemName = $"Saving {country.Alpha3Code}.svg to disk";
+
+                    Progress.Report(Report);
+                    #endregion
+                }
+            });
         }
 
         /// <summary>
