@@ -1,8 +1,8 @@
 ﻿namespace CountriesAPP
 {
+    using Services;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.IO;
     using System.Threading.Tasks;
     using System.Windows;
@@ -10,8 +10,6 @@
     using System.Windows.Threading;
     using API_Models;
     using CountriesAPP.Models;
-    using Models;
-    using Services;
     using ViewModels;
     using Views;
 
@@ -26,17 +24,26 @@
         private List<Country> Countries;
         private CountryMainViewModel countriesTab;
         private SQLService dataService;
-        private bool network = true;
+        private bool network;
+        private bool firstRun;
         #endregion
 
         public MainWindow()
         {
-            InitializeComponent();
-            StartClock();
+            #region Init Attributes
             countriesTab = new CountryMainViewModel();
             Countries = new List<Country>();
             dataService = new SQLService();
+            network = true;
+            firstRun = true;
+            #endregion
+
+            InitializeComponent();
+
+            StartClock();
+
             DataContext = countriesTab;
+
             LoadContent();
         }
 
@@ -52,7 +59,7 @@
             try
             {
                 LoadingBar.Value = 0;
-                
+
                 //check if there is internet connection
                 networkService = new NetworkService();
                 //TODO true for testing
@@ -69,25 +76,31 @@
                 }
 
                 //jumps from current block because there is no data loaded into Countries
-                if (Countries.Count == 0)
+                //or some save error happened
+                if (Countries.Count == 0 || Countries.Count < 250)
                 {
-                    LblLoadFrom.Text = $"Error Loading Data. Try restarting..";
+                    LblLoadFrom.Text = $"Couldn't connect to the API or the Database.";
+                    LblLoadSave.Text = "Error loading...";
+                    ProgressText.Text = "N/A";
                     return;
                 }
-                               
+
                 //adds the items from the list to a the dropdown list, displays the attribute Name from the list
                 CbCountry.ItemsSource = Countries;
                 CbCountry.DisplayMemberPath = "Name";
 
                 LoadingBar.Value = 100;
 
-                LblLoadSave.Text = "Data Loaded";
-
                 //when connected to the internet saves/updates data in DB
                 if (network)
                 {
                     await CheckLastUpdate();
                 }
+
+                //delaying the Data Saved lbl
+                await Task.Delay(5000);
+
+                LblLoadSave.Visibility = Visibility.Hidden;
             }
             catch (Exception ex)
             {
@@ -105,31 +118,35 @@
             //1st run
             if (!File.Exists(path))
             {
-                await SaveDataToSql(Countries);
-
-                File.WriteAllText(path, DateTime.Now.ToString("dd-MM-yyyy"));
+                await SaveDataToSql(path);
 
                 return;
             }
 
+            DateTime lastUpdate = ReadConfig(path);
+
+            if (DateTime.Now.Subtract(lastUpdate).TotalHours > 24)
+            {
+                await SaveDataToSql(path);
+            }
+        }
+
+        /// <summary>
+        /// opens and reads the config.sys file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>last DateTime DB updated</returns>
+        private DateTime ReadConfig(string path)
+        {
             StreamReader reader = new StreamReader(path);
 
             DateTime lastUpdate = DateTime.Parse(reader.ReadLine());
 
+            firstRun = false;
+
             reader.Close();
 
-            if (DateTime.Now.Subtract(lastUpdate).TotalDays > 2)
-            {
-                await SaveDataToSql(Countries);
-
-                File.WriteAllText(path, DateTime.Now.ToString("dd-MM-yyyy"));
-            }
-            
-            await Task.Delay(5000);
-
-            LblLoadSave.Visibility = Visibility.Hidden;
-            LoadingBar.Visibility = Visibility.Hidden;
-            ProgressText.Visibility = Visibility.Hidden;
+            return lastUpdate;
         }
 
         /// <summary>
@@ -138,7 +155,7 @@
         /// </summary>
         /// <param name="countries"></param>
         /// <returns></returns>
-        private async Task SaveDataToSql(List<Country> countries)
+        private async Task SaveDataToSql(string path)
         {
             try
             {
@@ -149,13 +166,15 @@
                 Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
                 progress.ProgressChanged += UpdateProgress;
 
-                LoadingBar.Value = 0;
                 LblLoadSave.Visibility = Visibility.Visible;
                 LblLoadSave.Text = "Saving to DataBase";
-                //saves new data on to DB               
-                await dataService.SaveData(Countries, progress);
 
-                LblLoadSave.Text = "All tables in Database updated";
+                //saves new data on to DB               
+                await dataService.SaveData(Countries, progress, firstRun);
+
+                File.WriteAllText(path, DateTime.Now.ToString("dd-MM-yyyy HH:mm"));
+
+                LblLoadSave.Text = "Database updated";
             }
             catch (Exception ex)
             {

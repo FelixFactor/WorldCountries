@@ -9,15 +9,11 @@
     /// </summary>
     public partial class ShowCountryDetails : UserControl
     {
-        private ShowCountryViewModel countryView;
-
         public ShowCountryDetails(Country country)
         {
             InitializeComponent();
 
-            countryView = new ShowCountryViewModel(country);
-
-            DataContext = countryView;
+            DataContext = new ShowCountryViewModel(country);
         }
     }
 }

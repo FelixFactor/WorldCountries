@@ -99,15 +99,15 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="70"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TextBlock x:Name="LblClock" FontSize="14" Margin="5,0,0,0"/>
             </StackPanel>
-            <ProgressBar Grid.Column="1" Name="LoadingBar" Foreground="Green" Height="18" Width="100" FlowDirection="RightToLeft"/>
-            <TextBlock Grid.Column="1" Name="ProgressText" Text="{Binding ElementName=LoadingBar, Path=Value, StringFormat={}{0:0}%}" Foreground="Black" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="2" Name="LblLoadSave" Text="Loading" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ProgressBar Grid.Column="2" Name="LoadingBar" Margin="5,0,0,0" Foreground="Green" Height="18" Width="100"/>
+            <TextBlock Grid.Column="2" Name="ProgressText" Text="{Binding ElementName=LoadingBar, Path=Value, StringFormat={}{0:0}%}" Foreground="Black" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="1" Name="LblLoadSave" Text="Loading" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Hidden"/>
             <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <materialDesign:PackIcon Kind="Network" Margin="0,0,10,0"/>
                 <TextBlock x:Name="LblLoadFrom" Text="Loading Data"/>
