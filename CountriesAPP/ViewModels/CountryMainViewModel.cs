@@ -1,16 +1,18 @@
 ﻿namespace CountriesAPP.ViewModels
 {
-    using Interfaces;
-    using Models;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
-
+    using System.Linq;
+    using CountriesAPP.Models;
+    using Interfaces;
+    
     public class CountryMainViewModel
     {
         //observable collection to the XAML
         private readonly ObservableCollection<ITab> countries;
+
         //observable collection to take all kind of tabs
         public ICollection<ITab> Countries { get; }
 
@@ -67,7 +69,12 @@
         /// <param name="tab"></param>
         public void AddTab(CountryTab tab)
         {
-            Countries.Add(tab);
+            var exists = Countries.Where(p => p.TabName == tab.TabName);
+
+            if (exists.Count() == 0)
+            {
+                Countries.Add(tab);
+            }
         }
     }
 }
