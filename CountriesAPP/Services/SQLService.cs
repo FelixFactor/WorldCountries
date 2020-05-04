@@ -17,10 +17,10 @@
         #region Attributes
         private SQLiteCommand command;
         private SQLiteConnection sqlConnection;
-        private List<string> SQLCmds = new List<string>();
-        private Country query = new Country();
-        private readonly ProgressReportModel Report = new ProgressReportModel();
-        private IProgress<ProgressReportModel> Progress = new Progress<ProgressReportModel>();
+        private List<string> SQLCmds;
+        private Country query;
+        private readonly ProgressReportModel Report;
+        private IProgress<ProgressReportModel> ReportProgress;
         private int saved;
         #endregion
 
@@ -30,6 +30,12 @@
         /// </summary>
         public SQLService()
         {
+            #region Init Attributes
+            SQLCmds = new List<string>();
+            Report = new ProgressReportModel();
+            query = new Country();
+            #endregion
+
             AddCreateCommands();
 
             if (!Directory.Exists("Data"))
@@ -245,11 +251,11 @@
         /// <summary>
         /// Saves data to SQL DB
         /// </summary>
-        public async Task SaveData(List<Country> Countries, IProgress<ProgressReportModel> progress)
+        public async Task SaveData(List<Country> Countries, IProgress<ProgressReportModel> progress, bool firstRun)
         {
-            Progress = progress;
+            ReportProgress = progress;
 
-            await DownloadFlags(Countries);
+            await DownloadFlags(Countries, firstRun);
 
             await SeparateCurrencies(Countries);
 
@@ -347,7 +353,7 @@
                         Report.CompletedPercent = (saved * 100) / countries.Count;
                         Report.ItemName = $"Updating Country: {country.Name}";
 
-                        Progress.Report(Report);
+                        ReportProgress.Report(Report);
                         #endregion
 
                         #region Empty Strings
@@ -554,7 +560,7 @@
                         Report.CompletedPercent = (saved * 100) / regionalbloc.Count;
                         Report.ItemName = $"Updating Economic Group: {bloc.Name}";
 
-                        Progress.Report(Report);
+                        ReportProgress.Report(Report);
                         #endregion
 
                         otherAcronym = string.Empty;
@@ -634,7 +640,7 @@
                         Report.CompletedPercent = (saved * 100) / languages.Count;
                         Report.ItemName = $"Updating Language: {language.Name}";
 
-                        Progress.Report(Report);
+                        ReportProgress.Report(Report);
                         #endregion
                     }
                 });
@@ -675,7 +681,7 @@
                         Report.CompletedPercent = (saved * 100) / currencies.Count;
                         Report.ItemName = $"Updating Currency: {currency.Name}";
 
-                        Progress.Report(Report);
+                        ReportProgress.Report(Report);
                         #endregion
                     }
                 });
@@ -691,7 +697,7 @@
         /// </summary>
         /// <param name="Countries"></param>
         /// <returns></returns>
-        private async Task DownloadFlags(List<Country> countries)
+        private async Task DownloadFlags(List<Country> countries, bool firstRun)
         {
             //TODO check if files exist to not download them all again
             WebClient client = new WebClient();
@@ -701,25 +707,28 @@
                 Directory.CreateDirectory("Data/LocalFlags");
             }
 
-            saved = 0;
-            await Task.Run(() =>
+            if (firstRun)
             {
-                foreach (Country country in countries)
+                saved = 0;
+                await Task.Run(() =>
                 {
-                    string path = $"Data/LocalFlags/{country.Alpha3Code}.svg";
+                    foreach (Country country in countries)
+                    {
+                        string path = $"Data/LocalFlags/{country.Alpha3Code}.svg";
 
-                    client.DownloadFile(country.Flag, path);
+                        client.DownloadFile(country.Flag, path);
 
-                    #region Progress Bar
-                    saved++;
+                        #region Progress Bar
+                        saved++;
 
-                    Report.CompletedPercent = (saved * 100) / countries.Count;
-                    Report.ItemName = $"Saving {country.Alpha3Code}.svg to disk";
+                        Report.CompletedPercent = (saved * 100) / countries.Count;
+                        Report.ItemName = $"Saving {country.Alpha3Code}.svg to disk";
 
-                    Progress.Report(Report);
-                    #endregion
-                }
-            });
+                        ReportProgress.Report(Report);
+                        #endregion
+                    }
+                });
+            }
         }
 
         /// <summary>

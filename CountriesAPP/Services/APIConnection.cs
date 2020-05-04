@@ -47,8 +47,6 @@
             }
             catch (Exception ex)
             {
-                //catches the exception and deals with it.
-                //returns an unsuccessfull operation and the message from the exception
                 return new Response { Success = false, Answer = ex.Message };
             }
         }

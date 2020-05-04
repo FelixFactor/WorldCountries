@@ -165,12 +165,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Interfaces\ITab.cs" />
+    <Compile Include="Models\ProgressReportModel.cs" />
     <Compile Include="Models\Tab.cs" />
     <Compile Include="Services\APIConnection.cs" />
     <Compile Include="Services\Httpclient.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Models\Response.cs" />
-    <Compile Include="Services\SQLiteService.cs" />
     <Compile Include="Services\SQLService.cs" />
     <Compile Include="ViewModels\ShowCountryViewModel.cs" />
     <Compile Include="Views\ShowCountryDetails.xaml.cs">
