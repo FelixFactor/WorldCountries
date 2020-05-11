@@ -88,6 +88,20 @@
                         </StackPanel>
 					    <TextBlock Text="{Binding Population, StringFormat='Population: {0}'}" Margin="10,10,10,0"/>
 					    <TextBlock Text="{Binding Capital, StringFormat='Capital: {0}'}" Margin="10"/>
+                        <StackPanel Orientation="Vertical" Margin="10,10,10,0">
+                            <TextBlock Text="Land Borders:" Margin="0,10,0,0"/>
+                            <ItemsControl ItemsSource="{Binding Borders}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                            <Hyperlink Click="Hyperlink_Click">
+                                                <TextBlock Text="{Binding}"/>
+                                            </Hyperlink>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
 				    </StackPanel>
 				    <!--#endregion-->
                 
@@ -156,8 +170,22 @@
                             </ItemsControl>
                         </StackPanel>
 					    <!--#endregion Currencies-->
-                        
-				    </StackPanel>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Currency Converter" Margin="10,10,0,0" Foreground="Gray"/>
+                            <StackPanel Margin="10,10,0,0" Orientation="Horizontal">
+                                <TextBlock Text="Convert:" VerticalAlignment="Center"/>
+                                <TextBox Background="White" x:Name="TbMoney" Width="60" PreviewTextInput="NumberValidationTextBox" MaxLength="6" TextChanged="TbMoney_TextChanged" RenderTransformOrigin="0.467,0.567"/>
+                                <ComboBox x:Name="CbRateCountry" ItemsSource="{Binding Currencies}" DisplayMemberPath="Code" SelectedIndex="0"/>
+                            </StackPanel>
+                            <StackPanel Margin="10,10,0,0" Orientation="Horizontal">
+                                <TextBlock Text="To:" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="CbRates" IsReadOnly="True" Width="200" Background="White"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock x:Name="LblConversion" Margin="10,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
 				    <!--#endregion Economy-->
                 </StackPanel>
                 

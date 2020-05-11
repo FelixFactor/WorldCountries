@@ -12,6 +12,7 @@
     using CountriesAPP.Models;
     using ViewModels;
     using Views;
+    using CountriesAPP.Models.API_Models;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -109,7 +110,7 @@
         }
 
         /// <summary>
-        /// limits the data update of the DB(once every 2days)
+        /// limits the data update of the DB(once every 24h)
         /// </summary>
         /// <returns></returns>
         private async Task CheckLastUpdate()
@@ -221,6 +222,12 @@
                 }
                 //loads the result on to the Countries list 
                 Countries = (List<Country>)response.Result;
+
+                response = await apiConnection.GetRates();
+
+                CurrencyConverter.Rates = (List<Rate>)response.Result;
+
+                CurrencyConverter.AddEuro();
             }
             catch (Exception ex)
             {

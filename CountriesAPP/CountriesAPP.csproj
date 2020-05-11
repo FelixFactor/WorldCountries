@@ -165,9 +165,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Interfaces\ITab.cs" />
+    <Compile Include="Models\API_Models\Rate.cs" />
     <Compile Include="Models\ProgressReportModel.cs" />
     <Compile Include="Models\Tab.cs" />
     <Compile Include="Services\APIConnection.cs" />
+    <Compile Include="Services\CurrencyConverter.cs" />
     <Compile Include="Services\Httpclient.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Models\Response.cs" />

@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
     using System.Windows;
     using API_Models;
+    using CountriesAPP.Models.API_Models;
     using Models;
     using MyToolkit.Utilities;
     
@@ -59,6 +60,8 @@
                         command.ExecuteNonQuery();
                     }
                 }
+
+                sqlConnection.Close();
             }
             catch (Exception ex)
             {
@@ -67,7 +70,7 @@
         }
 
         /// <summary>
-        /// Load data from SQL DB
+        /// Load data from country table in SQL DB
         /// </summary>
         public List<Country> GetData()
         {
@@ -77,8 +80,10 @@
 
             command = new SQLiteCommand(selectCmd, sqlConnection);
 
-            SQLiteDataReader result = command.ExecuteReader();
+            sqlConnection.Open();
 
+            SQLiteDataReader result = command.ExecuteReader();
+            
             while (result.Read())
             {
                 countries.Add(new Country
@@ -87,8 +92,49 @@
                     Alpha3Code = (string)result["alpha3Code"]
                 });
             }
+            result.Close();
+
+            sqlConnection.Close();
+
+            GetRates();
 
             return countries;
+        }
+
+        /// <summary>
+        /// Load data from rate table in SQL DB
+        /// </summary>
+        private void GetRates()
+        {
+            try
+            {
+                string sql = "select RateId, Code, TaxRate, Name from rate";
+                
+                command = new SQLiteCommand(sql, sqlConnection);
+
+                sqlConnection.Open();
+
+                SQLiteDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    CurrencyConverter.Rates.Add(new Rate
+                    {
+                        RateId = (int)reader["RateID"],
+                        Code = (string)reader["Code"],
+                        Name = (string)reader["Name"],
+                        TaxRate = (double)reader["TaxRate"]
+                    });
+                }
+                reader.Close();
+
+                sqlConnection.Close();
+            }
+            catch (System.Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+                
         }
 
         /// <summary>
@@ -103,42 +149,51 @@
                                "WHERE alpha3code like @alpha3Code";
 
             command = new SQLiteCommand(selectCmd, sqlConnection);
-
-            command.Parameters.AddWithValue("@alpha3Code", alpha3Code);
-
-            SQLiteDataReader result = command.ExecuteReader();
-
-            //Reader in action
-            while (result.Read())
+            try
             {
-                query.Alpha3Code = (string)result["alpha3Code"];
-                query.Name = (string)result["name"];
-                query.Alpha2Code = (string)result["alpha2Code"];
-                query.Capital = (string)result["capital"];
-                query.Region = (string)result["region"];
-                query.Subregion = (string)result["subRegion"];
-                query.Population = (int)result["population"];
-                query.Demonym = result["demonym"].ToString();
-                query.Area = (double)result["area"];
-                query.Gini = (double)result["giniIndex"];
-                query.NativeName = (string)result["nativeName"];
-                query.NumericCode = result["numericCode"].ToString();
-                query.Cioc = result["cioc"].ToString();
-                query.Latlng = DoubleConcatToList((string)result["latlong"]);
-                query.Borders = StringConcatToList((string)result["borders"]);
-                query.TopLevelDomain = StringConcatToList((string)result["topLevelDomain"]);
-                query.CallingCodes = StringConcatToList((string)result["callingCodes"]);
-                query.Timezones = StringConcatToList((string)result["timezones"]);
-                query.AltSpellings = StringConcatToList((string)result["altSpellings"]);
+                sqlConnection.Open();
+
+                command.Parameters.AddWithValue("@alpha3Code", alpha3Code);
+
+                SQLiteDataReader result = command.ExecuteReader();
+
+                //Reader in action
+                while (result.Read())
+                {
+                    query.Alpha3Code = (string)result["alpha3Code"];
+                    query.Name = (string)result["name"];
+                    query.Alpha2Code = (string)result["alpha2Code"];
+                    query.Capital = (string)result["capital"];
+                    query.Region = (string)result["region"];
+                    query.Subregion = (string)result["subRegion"];
+                    query.Population = (int)result["population"];
+                    query.Demonym = result["demonym"].ToString();
+                    query.Area = (double)result["area"];
+                    query.Gini = (double)result["giniIndex"];
+                    query.NativeName = (string)result["nativeName"];
+                    query.NumericCode = result["numericCode"].ToString();
+                    query.Cioc = result["cioc"].ToString();
+                    query.Latlng = DoubleConcatToList((string)result["latlong"]);
+                    query.Borders = StringConcatToList((string)result["borders"]);
+                    query.TopLevelDomain = StringConcatToList((string)result["topLevelDomain"]);
+                    query.CallingCodes = StringConcatToList((string)result["callingCodes"]);
+                    query.Timezones = StringConcatToList((string)result["timezones"]);
+                    query.AltSpellings = StringConcatToList((string)result["altSpellings"]);
+                }
+                result.Close();
+
+                QueryCurrency();
+                QueryLanguage();
+                QueryTranslations();
+                QueryRegionalBloc();
+
+                return query;
             }
-            result.Close();
-
-            QueryCurrency();
-            QueryLanguage();
-            QueryTranslations();
-            QueryRegionalBloc();
-
-            return query;
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+                return null;
+            }
         }
 
         /// <summary>
@@ -165,6 +220,8 @@
                     OtherNames = StringConcatToArray((string)result["otherNames"])
                 });
             }
+
+            result.Close();
         }
 
         /// <summary>
@@ -194,6 +251,8 @@
                 query.Translations.Hr = (string)result["hr"].ToString();
                 query.Translations.Fa = (string)result["fa"].ToString();
             }
+
+            result.Close();
         }
 
         /// <summary>
@@ -220,6 +279,8 @@
                     NativeName = (string)result["nativeName"],
                 });
             }
+
+            result.Close();
         }
 
         /// <summary>
@@ -245,6 +306,8 @@
                     Symbol = (string)result["symbol"].ToString()
                 });
             }
+
+            result.Close();
         }
 
 
@@ -264,6 +327,59 @@
             await SeparateLanguage(Countries);
 
             await SaveCountries(Countries);
+
+            await SaveRates();
+        }
+
+        /// <summary>
+        /// Saves data to the rate table in SQL
+        /// </summary>
+        /// <param name="rates"></param>
+        /// <returns></returns>
+        private async Task SaveRates()
+        {
+            string insertCmd = "INSERT INTO rate VALUES(@rateId, @code, @taxRate, @name)";
+
+            saved = 0;
+            try
+            {
+                command = new SQLiteCommand(insertCmd, sqlConnection);
+
+                sqlConnection.Open();
+
+                await Task.Run(() =>
+                {
+                    foreach (var rate in CurrencyConverter.Rates)
+                    {
+                        
+
+                        #region Parameters and Values
+                        command.Parameters.AddWithValue("@rateId", rate.RateId);
+                        command.Parameters.AddWithValue("@code", rate.Code);
+                        command.Parameters.AddWithValue("@taxRate", rate.TaxRate);
+                        command.Parameters.AddWithValue("@name", rate.Name);
+                        #endregion
+
+                        command.ExecuteNonQuery();
+
+                        #region Progress Bar
+                        saved++;
+
+                        Report.CompletedPercent = (saved * 100) / CurrencyConverter.Rates.Count;
+                        Report.ItemName = $"Updating Rate: {rate.Name}";
+
+                        ReportProgress.Report(Report);
+                        #endregion
+
+                    }
+                });
+                
+                sqlConnection.Close();
+            }
+            catch (System.Exception e)
+            {
+                MessageBox.Show(e.Message + "\n" + e.StackTrace);
+            }
         }
 
         /// <summary>
@@ -279,6 +395,10 @@
             saved = 0;
             try
             {
+                command = new SQLiteCommand(insertCmd, sqlConnection);
+
+                sqlConnection.Open();
+
                 await Task.Run(() =>
                 {
                     foreach (Country country in countries)
@@ -287,8 +407,6 @@
                         SaveCountry_currency(country);
                         SaveCountry_regionalBloc(country);
                         SaveCountry_language(country);
-
-                        command = new SQLiteCommand(insertCmd, sqlConnection);
 
                         #region Concatenate Strings
                         //list of borders
@@ -365,7 +483,9 @@
                         altSpellings = string.Empty;
                         #endregion
                     }
-                });                
+                });
+
+                sqlConnection.Close();
             }
             catch (Exception ex)
             {
@@ -524,15 +644,18 @@
             string insertCmd = "INSERT INTO regionalBloc VALUES(@acronym, @name, @otherAcronym, @otherNames)";
 
             string otherAcronym = string.Empty, otherNames = string.Empty;
+
+            saved = 0;
             try
             {
-                saved = 0;
+                command = new SQLiteCommand(insertCmd, sqlConnection);
+
+                sqlConnection.Open();
+
                 await Task.Run(() =>
                 {
                     foreach (Regionalbloc bloc in regionalbloc)
                     {
-                        command = new SQLiteCommand(insertCmd, sqlConnection);
-
                         #region Concatenate Strings
                         //list of otherAcronyms
                         foreach (string other in bloc.OtherAcronyms)
@@ -567,6 +690,8 @@
                         otherNames = string.Empty;
                     }
                 });
+
+                sqlConnection.Close();
             }
             catch (Exception ex)
             {
@@ -603,6 +728,8 @@
 
                 await command.ExecuteNonQueryAsync();                
             }
+
+            
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
@@ -619,6 +746,8 @@
             try
             {
                 command = new SQLiteCommand(insertCmd, sqlConnection);
+
+                sqlConnection.Open();
 
                 saved = 0;
                 await Task.Run(() =>
@@ -644,6 +773,8 @@
                         #endregion
                     }
                 });
+
+                sqlConnection.Close();
             }
             catch (Exception ex)
             {
@@ -661,6 +792,8 @@
             try
             {
                 command = new SQLiteCommand(insertCmd, sqlConnection);
+
+                sqlConnection.Open();
 
                 saved = 0;
                 await Task.Run(() =>
@@ -685,6 +818,8 @@
                         #endregion
                     }
                 });
+
+                sqlConnection.Close();
             }
             catch (Exception ex)
             {
@@ -740,6 +875,8 @@
 
             try
             {
+                sqlConnection.Open();
+
                 using (command = new SQLiteCommand(sqlConnection))
                 {
                     foreach (string cmd in SQLCmds)
@@ -749,6 +886,8 @@
                         command.ExecuteNonQuery();
                     }
                 }
+
+                sqlConnection.Close();
             }
             catch (Exception ex)
             {
@@ -776,6 +915,7 @@
             SQLCmds.Add("CREATE TABLE IF NOT EXISTS country_currency(idCountry CHAR(3) REFERENCES country(alpha3Code), idCurrency CHAR(3) REFERENCES currency(code))");
             SQLCmds.Add("CREATE TABLE IF NOT EXISTS country_regionalBloc(idCountry CHAR(3) REFERENCES country(alpha3Code), idBloc VARCHAR(10) REFERENCES regionalBloc(acronym))");
             SQLCmds.Add("CREATE TABLE IF NOT EXISTS country_language(idCountry CHAR(3) REFERENCES country(alpha3Code), idLang CHAR(3) REFERENCES language(iso639_2))");
+            SQLCmds.Add("CREATE table IF NOT EXISTS rate ('RateId' INT, 'Code' VARCHAR(5), 'TaxRate' REAL, 'Name' VARCHAR(250))");
         }
 
         /// <summary>
@@ -794,6 +934,7 @@
             SQLCmds.Add("DELETE FROM country_currency");
             SQLCmds.Add("DELETE FROM country_regionalBloc");
             SQLCmds.Add("DELETE FROM country_language");
+            SQLCmds.Add("DELETE FROM rate");
         }
 
         /// <summary>

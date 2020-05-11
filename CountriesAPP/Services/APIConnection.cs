@@ -1,10 +1,12 @@
 ﻿namespace CountriesAPP.Services
 {
     using API_Models;
+    using CountriesAPP.Models.API_Models;
     using Models;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
 
@@ -44,6 +46,36 @@
                 var countries = JsonConvert.DeserializeObject<List<Country>>(result, options);
 
                 return new Response { Success = true, Result = countries };
+            }
+            catch (Exception ex)
+            {
+                return new Response { Success = false, Answer = ex.Message };
+            }
+        }
+
+        public async Task<Response> GetRates()
+        {
+            try
+            {
+                var client = new HttpClient();
+                client.BaseAddress = new Uri("https://cambiosrafa.azurewebsites.net");
+
+                var response = await client.GetAsync("/api/rates");
+
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new Response
+                    {
+                        Success = false,
+                        Answer = result
+                    };
+                }
+
+                var rates = JsonConvert.DeserializeObject<List<Rate>>(result);
+
+                return new Response { Success = true, Result = rates };
             }
             catch (Exception ex)
             {
