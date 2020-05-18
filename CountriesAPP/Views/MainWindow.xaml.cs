@@ -8,11 +8,11 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Threading;
-    using API_Models;
-    using CountriesAPP.Models;
     using ViewModels;
     using Views;
+    using CountriesAPP.Models;
     using CountriesAPP.Models.API_Models;
+
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -45,6 +45,8 @@
 
             DataContext = countriesTab;
 
+            HelpPageLoad();
+
             LoadContent();
         }
 
@@ -64,7 +66,7 @@
                 //check if there is internet connection
                 networkService = new NetworkService();
                 //TODO true for testing
-                if (!networkService.CheckNetConnection())
+                if (networkService.CheckNetConnection())
                 {
                     LoadFromDB();
                     LblLoadFrom.Text = $"Data loaded from local DataBase on {DateTime.Now}";
@@ -160,7 +162,7 @@
         {
             try
             {
-                await Task.Delay(5000);
+                await Task.Delay(3000);
                 //deletes data on the DB 
                 dataService.DeleteData();
 
@@ -236,16 +238,6 @@
         }
 
         /// <summary>
-        /// Exit button
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BtnExit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        /// <summary>
         /// creates a new tab when a item from the CBox is selected
         /// </summary>
         /// <param name="sender"></param>
@@ -268,7 +260,7 @@
                 //adds the selected item name(country) and the usercontrol page to the viewModel to be presented in the tab
                 CountryTab tab = new CountryTab(selected.Name, newTab);
 
-                countriesTab.AddTab(tab);
+                CountryMainViewModel.AddTab(tab);
 
                 CountryTabs.SelectedItem = tab;
             }
@@ -292,6 +284,55 @@
         private void TickEvent(object sender, EventArgs e)
         {
             LblClock.Text = DateTime.Now.ToLongTimeString();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnHelp_Click(object sender, RoutedEventArgs e)
+        {
+            HelpPageLoad();
+        }
+
+        /// <summary>
+        /// creates an help page and displays it
+        /// </summary>
+        private void HelpPageLoad()
+        {
+            string name = "Help";
+
+            HelpPage page = new HelpPage();
+
+            HelpTab tab = new HelpTab(name, page);
+
+            CountryMainViewModel.AddTab(tab);
+
+            CountryTabs.SelectedItem = tab;
+        }
+
+        /// <summary>
+        /// Exit button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnExit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void BtnAbout_Click(object sender, RoutedEventArgs e)
+        {
+            string name = "About";
+
+            About page = new About();
+
+            AboutTab tab = new AboutTab(name, page);
+
+            CountryMainViewModel.AddTab(tab);
+
+            CountryTabs.SelectedItem = tab;
         }
     }
 }

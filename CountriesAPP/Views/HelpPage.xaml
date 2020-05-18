@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="CountriesAPP.Views.HelpPage"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 			 
+			 xmlns:local="clr-namespace:CountriesAPP"
+			 mc:Ignorable="d" 
+			 d:DesignHeight="455" d:DesignWidth="900"
+			 FontWeight="Light"
+			 TextElement.FontSize="14"
+			 FontFamily="#Roboto,Wingdings" 
+			 TextElement.Foreground="Black"
+			 TextOptions.TextFormattingMode="Ideal"
+			 TextOptions.TextRenderingMode="Auto"
+			 Background="WhiteSmoke">
+    <Grid>
+        <!--#region Row Definitions-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="120"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!--#endregion-->
+
+        <Grid Grid.Row="0">
+            <TextBlock Text="Don't know where to click?" FontSize="46" Padding="25"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <StackPanel>
+                <StackPanel Orientation="Vertical" Margin="50,20,50,0" Background="LightGray">
+                    <TextBlock Padding="20">
+                        Quick Start
+                        <LineBreak/>
+                        <TextBlock Text="Select one of the countries from the drop-down menu above." Margin="5"/>
+                        <LineBreak/>
+                        <TextBlock Text="Alternately you can select a country by typing it's name and hitting ENTER." Margin="5"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Margin="50,20,50,0" Background="LightGray">
+                    <TextBlock Padding="20">
+                        Advanced Search
+                        <LineBreak/>
+                        <TextBlock Text="Click Advanced Search and refine your search from the options available" Margin="5"/>
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+    
+</UserControl>

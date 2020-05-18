@@ -51,10 +51,10 @@
                 <!--#region Exit/Help/About Buttons Row-->
                 <Grid Grid.Row="0" HorizontalAlignment="Right">
                     <StackPanel Orientation="Horizontal">
-                        <Button x:Name="BtnHelp" ToolTip="Don't know how to work with this App?!" BorderThickness="0" Foreground="Red" BorderBrush="{x:Null}" Background="{x:Null}">
+                        <Button x:Name="BtnHelp" ToolTip="Don't know how to work with this App?!" BorderThickness="0" Foreground="Red" BorderBrush="{x:Null}" Background="{x:Null}" Click="BtnHelp_Click">
                             <materialDesign:PackIcon Kind="Help"/>
                         </Button>
-                        <Button x:Name="BtnAbout" ToolTip="Who made this?!" BorderThickness="0" Foreground="WhiteSmoke"  BorderBrush="{x:Null}" Background="{x:Null}">
+                        <Button x:Name="BtnAbout" ToolTip="Who made this?!" BorderThickness="0" Foreground="WhiteSmoke"  BorderBrush="{x:Null}" Background="{x:Null}" Click="BtnAbout_Click">
                             <materialDesign:PackIcon Kind="About"/>
                         </Button>
                         <Button x:Name="BtnExit" ToolTip="Please stay a little while!" BorderThickness="0" Foreground="GreenYellow" BorderBrush="{x:Null}" Background="{x:Null}" ButtonBase.Click="BtnExit_Click">
@@ -65,7 +65,7 @@
                 <!--#endregion-->
                 <Grid Grid.Row="2">
                     <!--ComboBox to display the countries-->
-                    <ComboBox x:Name="CbCountry" Margin="5" Width="350" HorizontalAlignment="Left" Background="WhiteSmoke" Foreground="DarkGray" SelectionChanged="CbCountry_SelectionChanged"/>                    
+                    <ComboBox x:Name="CbCountry" Margin="5" Width="350" HorizontalAlignment="Left" Background="WhiteSmoke" Foreground="DarkGray"  SelectionChanged="CbCountry_SelectionChanged"/>                    
                 </Grid>
             </Grid>
         </Grid>

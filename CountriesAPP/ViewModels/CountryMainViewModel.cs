@@ -14,7 +14,7 @@
         private readonly ObservableCollection<ITab> countries;
 
         //observable collection to take all kind of tabs
-        public ICollection<ITab> Countries { get; }
+        public static ICollection<ITab> Countries { get; set; }
 
         public CountryMainViewModel()
         {
@@ -67,7 +67,7 @@
         /// Adds a new tab programatically to the observable collection
         /// </summary>
         /// <param name="tab"></param>
-        public void AddTab(CountryTab tab)
+        public static void AddTab(ITab tab)
         {
             var exists = Countries.Where(p => p.TabName == tab.TabName);
 
