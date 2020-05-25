@@ -12,6 +12,8 @@
     using Views;
     using CountriesAPP.Models;
     using CountriesAPP.Models.API_Models;
+    using System.Linq;
+    using MyToolkit.Utilities;
 
 
     /// <summary>
@@ -27,6 +29,9 @@
         private SQLService dataService;
         private bool network;
         private bool firstRun;
+        private List<Country> filtered;
+        private List<string> Regions;
+        private List<string> SubRegions;
         #endregion
 
         public MainWindow()
@@ -37,6 +42,9 @@
             dataService = new SQLService();
             network = true;
             firstRun = true;
+            filtered = new List<Country>();
+            Regions = new List<string>();
+            SubRegions = new List<string>();
             #endregion
 
             InitializeComponent();
@@ -91,6 +99,9 @@
                 //adds the items from the list to a the dropdown list, displays the attribute Name from the list
                 CbCountry.ItemsSource = Countries;
                 CbCountry.DisplayMemberPath = "Name";
+                CbCountry.Text = "Select a Country";
+
+                await CreateAdvancedSearchData();
 
                 LoadingBar.Value = 100;
 
@@ -249,6 +260,11 @@
             {
                 selected = (Country)CbCountry.SelectedItem;
 
+                if (selected == null)
+                {
+                    return;
+                }
+
                 if (!network)
                 {
                     selected = dataService.QueryCountry(selected.Alpha3Code);
@@ -322,6 +338,11 @@
             this.Close();
         }
 
+        /// <summary>
+        /// Event click Button About
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnAbout_Click(object sender, RoutedEventArgs e)
         {
             string name = "About";
@@ -333,6 +354,131 @@
             CountryMainViewModel.AddTab(tab);
 
             CountryTabs.SelectedItem = tab;
+        }
+
+        /// <summary>
+        /// Event click - Shows menu advanced search
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AdvancedSearch_Click(object sender, RoutedEventArgs e)
+        {
+            TbLink.Visibility = Visibility.Collapsed;
+            StackAdvanced.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// async sets up the combo boxes for the advanced search
+        /// </summary>
+        /// <returns></returns>
+        private async Task CreateAdvancedSearchData()
+        {
+            await Task.Run(() =>
+            {
+                foreach (Country item in Countries)
+                {
+                    Regions.Add(item.Region);
+                    SubRegions.Add(item.Subregion);
+                }
+            });
+
+            Regions = Regions.DistinctBy(x => x.Length).OrderBy(x => x.Substring(0)).ToList();
+            SubRegions = SubRegions.DistinctBy(x => x.Substring(0)).OrderBy(x => x.Substring(0)).ToList();
+
+            CbRegion.ItemsSource = Regions;
+            
+            CbSubRegion.ItemsSource = SubRegions;
+        }
+
+        /// <summary>
+        /// event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void CbRegion_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (CbRegion.SelectedIndex == -1)
+                {
+                    return;
+                }
+
+                string filterRegion = CbRegion.SelectedValue.ToString();
+
+                filtered = Countries.Where(x => x.Region == filterRegion).ToList();
+                
+                CbCountry.ItemsSource = filtered;
+
+                List<string> filterSubRegion = new List<string>();
+
+                await Task.Run(() =>
+                {
+                    foreach (Country item in filtered)
+                    {
+                        filterSubRegion.Add(item.Subregion);
+                    }
+                });
+
+                filterSubRegion = filterSubRegion.DistinctBy(x => x.Substring(0)).OrderBy(x => x.Substring(0)).ToList();
+
+                CbSubRegion.ItemsSource = filterSubRegion;
+            }
+            catch (Exception)
+            {
+                CbCountry.ItemsSource = Countries;
+            }
+        }
+
+        /// <summary>
+        /// event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CbSubRegion_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (CbSubRegion.SelectedIndex == -1)
+                {
+                    return;
+                }
+
+                string filterRegion = CbSubRegion.SelectedValue.ToString();
+
+                filtered = Countries.Where(x => x.Subregion == filterRegion).ToList();
+
+                CbCountry.ItemsSource = filtered;
+            }
+            catch (Exception)
+            {
+                CbCountry.ItemsSource = Countries;
+            }
+        }
+
+        /// <summary>
+        /// Button to reset the combo box filters
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ResetFilter_Click(object sender, RoutedEventArgs e)
+        {
+            CbCountry.SelectedIndex = -1;
+            CbRegion.SelectedIndex = -1;
+            CbSubRegion.ItemsSource = SubRegions;
+            CbSubRegion.SelectedIndex = -1;
+            CbCountry.ItemsSource = Countries;
+        }
+
+        /// <summary>
+        /// event - hides the advanced search menu 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnCloseAdvSearch_Click(object sender, RoutedEventArgs e)
+        {
+            TbLink.Visibility = Visibility.Visible;
+            StackAdvanced.Visibility = Visibility.Collapsed;
         }
     }
 }
