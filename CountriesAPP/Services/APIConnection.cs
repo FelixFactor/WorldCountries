@@ -1,12 +1,10 @@
 ﻿namespace CountriesAPP.Services
 {
-    using API_Models;
     using CountriesAPP.Models.API_Models;
     using Models;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
 

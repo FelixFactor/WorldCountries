@@ -5,7 +5,7 @@
 
     public static class CurrencyConverter
     {
-        public static List<Rate> Rates { get; set; }
+        public static List<Rate> Rates { get; set; } = new List<Rate>();
 
         public static void AddEuro()
         {

@@ -1,4 +1,4 @@
-﻿namespace CountriesAPP.API_Models
+﻿namespace CountriesAPP.Models.API_Models
 {
     public class Currency
     {

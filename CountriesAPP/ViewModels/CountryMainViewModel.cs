@@ -5,9 +5,8 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.Linq;
-    using CountriesAPP.Models;
     using Interfaces;
-    
+
     public class CountryMainViewModel
     {
         //observable collection to the XAML

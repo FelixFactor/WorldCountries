@@ -8,7 +8,6 @@
     using System.Net;
     using System.Threading.Tasks;
     using System.Windows;
-    using API_Models;
     using CountriesAPP.Models.API_Models;
     using Models;
     using MyToolkit.Utilities;
@@ -76,7 +75,7 @@
         {
             List<Country> countries = new List<Country>();
 
-            string selectCmd = "SELECT name, alpha3Code FROM country";
+            string selectCmd = "SELECT name, alpha3Code, region, subregion FROM country";
 
             command = new SQLiteCommand(selectCmd, sqlConnection);
 
@@ -89,7 +88,9 @@
                 countries.Add(new Country
                 {
                     Name = (string)result["name"],
-                    Alpha3Code = (string)result["alpha3Code"]
+                    Alpha3Code = (string)result["alpha3Code"],
+                    Region = (string)result["region"],
+                    Subregion = (string)result["subregion"]
                 });
             }
             result.Close();
@@ -187,11 +188,16 @@
                 QueryTranslations();
                 QueryRegionalBloc();
 
+                sqlConnection.Close();
+
                 return query;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+
+                sqlConnection.Close();
+
                 return null;
             }
         }
@@ -395,8 +401,6 @@
             saved = 0;
             try
             {
-                command = new SQLiteCommand(insertCmd, sqlConnection);
-
                 sqlConnection.Open();
 
                 await Task.Run(() =>
@@ -407,6 +411,8 @@
                         SaveCountry_currency(country);
                         SaveCountry_regionalBloc(country);
                         SaveCountry_language(country);
+
+                        command = new SQLiteCommand(insertCmd, sqlConnection);
 
                         #region Concatenate Strings
                         //list of borders
@@ -834,7 +840,6 @@
         /// <returns></returns>
         private async Task DownloadFlags(List<Country> countries, bool firstRun)
         {
-            //TODO check if files exist to not download them all again
             WebClient client = new WebClient();
 
             if (!Directory.Exists("Data/LocalFlags"))

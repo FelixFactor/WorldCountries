@@ -1,4 +1,4 @@
-﻿namespace CountriesAPP.API_Models
+﻿namespace CountriesAPP.Models.API_Models
 {
     using System.Collections.Generic;
     using System.Drawing;

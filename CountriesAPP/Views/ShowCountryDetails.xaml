@@ -26,12 +26,11 @@
 		<!--#region Column[0]-->
         <Grid Grid.Column="0" Background="LightGray">
             <Grid.RowDefinitions>
-                <RowDefinition Height="110"/>
+                <RowDefinition Height="100"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0">
-                <Image Source="{Binding LocalFlag, Converter={svgc:SvgImageConverter}, Mode=OneWay}" />    
-            </StackPanel>
+            
+            <Image Grid.Row="0" Source="{Binding LocalFlag, Converter={svgc:SvgImageConverter}, Mode=OneWay}" Stretch="Fill"/>    
             
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
 		    <StackPanel Grid.Column="0" Orientation="Vertical">
@@ -115,7 +114,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <StackPanel Orientation="Horizontal" Width="80">
+                                            <StackPanel Orientation="Horizontal" Width="90">
                                                 <TextBlock Text=" "/>
                                                 <TextBlock Text="{Binding Name}"/>
                                             </StackPanel>
@@ -161,9 +160,9 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" Width="Auto">
                                             <TextBlock Text=" "/>
-                                            <TextBlock Text="{Binding Name}"/>
-                                            <TextBlock Text="{Binding Code, StringFormat=({0})}"/>
-                                            <TextBlock Text="{Binding Symbol}" Margin="10,0,0,0" TextAlignment="Right"/>
+                                            <TextBlock Text="{Binding Name}" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Code, StringFormat=({0})}" TextWrapping="WrapWithOverflow"/>
+                                            <TextBlock Text="{Binding Symbol}" Margin="10,0,0,0" TextAlignment="Right" TextWrapping="WrapWithOverflow"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -175,7 +174,7 @@
                             <StackPanel Margin="10,10,0,0" Orientation="Horizontal">
                                 <TextBlock Text="Convert:" VerticalAlignment="Center"/>
                                 <TextBox Background="White" x:Name="TbMoney" Width="60" PreviewTextInput="NumberValidationTextBox" MaxLength="6" TextChanged="TbMoney_TextChanged" RenderTransformOrigin="0.467,0.567"/>
-                                <ComboBox x:Name="CbRateCountry" ItemsSource="{Binding Currencies}" DisplayMemberPath="Code" SelectedIndex="0"/>
+                                <ComboBox x:Name="CbRateCountry" ItemsSource="{Binding Currencies}" DisplayMemberPath="Code" SelectedIndex="0" Margin="5,0"/>
                             </StackPanel>
                             <StackPanel Margin="10,10,0,0" Orientation="Horizontal">
                                 <TextBlock Text="To:" VerticalAlignment="Center"/>

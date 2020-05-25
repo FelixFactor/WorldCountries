@@ -2,16 +2,16 @@
 {
     using System.Windows.Controls;
     using System.Windows;
-    using ViewModels;
-    using API_Models;
-    using CountriesAPP.Services;
-    using CountriesAPP.Models;
     using System.Text.RegularExpressions;
     using System.Windows.Input;
-    using CountriesAPP.Models.API_Models;
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using ViewModels;
+    using CountriesAPP.Services;
+    using CountriesAPP.Models.API_Models;
+    using CountriesAPP.Models;
+    using System.Windows.Documents;
 
     /// <summary>
     /// Interaction logic for ShowCountryDetails.xaml
@@ -31,14 +31,16 @@
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             SQLService fast = new SQLService();
-            var search = fast.QueryCountry(e.Source.ToString()); ;
+
+            Hyperlink hp = (Hyperlink)e.Source;
+            
+            var search = fast.QueryCountry(hp.DataContext.ToString());
 
             ShowCountryDetails border = new ShowCountryDetails(search);
 
             CountryTab newTab = new CountryTab(search.Name, border);
 
-            CountryMainViewModel quick = new CountryMainViewModel();
-            quick.AddTab(newTab);
+            CountryMainViewModel.AddTab(newTab);
         }
 
         /// <summary>
@@ -59,13 +61,19 @@
         /// <param name="e"></param>
         private async void TbMoney_TextChanged(object sender, TextChangedEventArgs e)
         {
-            await Task.Delay(2000);
+            await Task.Delay(1500);
 
             Rate countryRate = new Rate();
             Currency currency = (Currency)CbRateCountry.SelectedItem;
 
             try
             {
+                if (string.IsNullOrEmpty(TbMoney.Text))
+                {
+                    LblConversion.Text = string.Empty;
+                    return;
+                }
+
                 var result = CurrencyConverter.Rates.Where(x => x.Code == currency.Code);
 
                 foreach (Rate item in result)
@@ -80,7 +88,7 @@
                 LblConversion.Text = string.Format("{0} {1:C2} = {2} {3:C2}",
                     countryRate.Code, TbMoney.Text, convertRate.Code, converted);
             }
-            catch
+            catch(Exception)
             {
                 LblConversion.Text = "The origin rate doesn't exist on our database.";
             }
