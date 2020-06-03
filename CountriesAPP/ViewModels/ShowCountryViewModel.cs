@@ -1,10 +1,10 @@
 ﻿namespace CountriesAPP.ViewModels
 {
-    using System.Collections.Generic;
+    using System;
     using System.Collections.ObjectModel;
     using CountriesAPP.Models.API_Models;
     using CountriesAPP.Services;
-
+    
     public class ShowCountryViewModel
     {
         #region Attributes
@@ -16,7 +16,7 @@
         public ShowCountryViewModel(Country country)
         {
             modCountry = country;
-            //CheckNulls();
+            CheckNulls();
 
             Countries = new ObservableCollection<Country>
             {
@@ -27,13 +27,36 @@
             {
                 Rates.Add(rate);
             }
-
-            
         }
 
         private void CheckNulls()
         {
-            
+            try
+            {
+                if (modCountry.Region == string.Empty)
+                {
+                    modCountry.Region = "None";
+                }
+
+                if (modCountry.Subregion == string.Empty)
+                {
+                    modCountry.Subregion = "None";
+                }
+
+                if (modCountry.Capital == string.Empty)
+                {
+                    modCountry.Capital = "None";
+                }
+
+                if (modCountry.AltSpellings.Count == 0)
+                {
+                    modCountry.AltSpellings.Add("None");
+                }
+            }
+            catch (Exception)
+            {
+
+            }
         }
     }
 }

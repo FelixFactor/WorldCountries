@@ -8,8 +8,7 @@
         Title="World of Countries" Height="600" Width="900"
         FontWeight="Medium"
         TextElement.FontSize="12"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" 
-        WindowStyle="SingleBorderWindow"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -17,8 +16,8 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignPaper}">
-    
+        Background="{DynamicResource MaterialDesignPaper}" WindowStyle="None">
+
     <Grid>
         <!--#region Window Layout Definitions-->
         <Grid.RowDefinitions>
@@ -36,7 +35,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <!--#region Title-->
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0" PreviewMouseLeftButtonDown="Grid_PreviewMouseLeftButtonDown">
                 <Label Content="World" Margin="5" FontSize="28"/>
                 <Label Content="of" Margin="5,40,0,0" FontSize="15"/>
                 <Label Content="Countries" Margin="5,60,0,0" FontSize="32"/>
@@ -64,28 +63,31 @@
                 </Grid>
                 <!--#endregion-->
 
+                <!--#region Advanced Search-->
                 <Grid Grid.Row="1">
                     <StackPanel Orientation="Horizontal" Name="StackAdvanced" Visibility="Collapsed">
-                        
-                        <wpf:ComboBox x:Name="CbRegion" Margin="5,0" Width="170" Foreground="DarkGray" Background="WhiteSmoke" HorizontalAlignment="Left" SelectionChanged="CbRegion_SelectionChanged"/>
 
-                        <wpf:ComboBox x:Name="CbSubRegion" Margin="5,0" Width="170" Foreground="DarkGray" Background="WhiteSmoke" HorizontalAlignment="Left" SelectionChanged="CbSubRegion_SelectionChanged"/>
+                        <wpf:ComboBox x:Name="CbRegion" ToolTip="Filter by Region" Margin="5,0" Width="170" Foreground="DarkGray" Background="WhiteSmoke" HorizontalAlignment="Left" SelectionChanged="CbRegion_SelectionChanged"/>
+
+                        <wpf:ComboBox x:Name="CbSubRegion" ToolTip="Filter by SubRegion" Margin="5,0" Width="170" Foreground="DarkGray" Background="WhiteSmoke" HorizontalAlignment="Left" SelectionChanged="CbSubRegion_SelectionChanged"/>
 
                         <TextBlock Margin="5,0" VerticalAlignment="Center" Width="45" TextWrapping="Wrap">
                             <Hyperlink TextDecorations="none" Click="ResetFilter_Click">Reset Values</Hyperlink>
                         </TextBlock>
 
-                        <Button x:Name="BtnCloseAdvSearch" Height="20" Width="20" VerticalAlignment="Center" Click="BtnCloseAdvSearch_Click"/>
+                        <Button x:Name="BtnCloseAdvSearch" Content="«" HorizontalAlignment="Left" VerticalContentAlignment="Top" Background="Transparent" BorderThickness="0" Foreground="WhiteSmoke" FontSize="18" Height="20" Width="20" VerticalAlignment="Center" Padding="0" ToolTip="Collapse" Click="BtnCloseAdvSearch_Click"/>
 
                     </StackPanel>
                     <TextBlock x:Name="TbLink" Margin="5,0" VerticalAlignment="Center">
                         <Hyperlink Click="AdvancedSearch_Click" TextDecorations="none">Advanced Search</Hyperlink>
                     </TextBlock>
                 </Grid>
-                
+                <!--#endregion-->
+
+
                 <Grid Grid.Row="2">
                     <!--ComboBox to display the countries-->
-                    <ComboBox x:Name="CbCountry" Margin="5,0" Width="350" HorizontalAlignment="Left" Background="WhiteSmoke" Foreground="DarkGray"  SelectionChanged="CbCountry_SelectionChanged"/>                    
+                    <ComboBox x:Name="CbCountry" Margin="5,0" Width="350" HorizontalAlignment="Left" Background="WhiteSmoke" Foreground="DarkGray"  SelectionChanged="CbCountry_SelectionChanged"/>
                 </Grid>
             </Grid>
         </Grid>

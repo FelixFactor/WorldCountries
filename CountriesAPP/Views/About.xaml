@@ -24,7 +24,7 @@
 
         <Grid Grid.Row="0">
             <TextBlock Text="World of Countries" FontSize="46" Padding="25"/>
-            <TextBlock Text="version 1.0.1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"/>
+            <TextBlock x:Name="LblVersion" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"/>
         </Grid>
 
         <Grid Grid.Row="1">
@@ -43,13 +43,13 @@
                         <TextBlock Padding="20">
                         Application Programming Interface (API)
                         <LineBreak/>
-                        <Hyperlink NavigateUri="http://restcountries.eu/#rest-countries">
+                        <Hyperlink NavigateUri="http://restcountries.eu/#rest-countries" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="none">
                             <TextBlock Text="REST Countries" Margin="5"/>
                         </Hyperlink>
                         <TextBlock Text="version 2.0.5" Margin="124,5"/>
                         <LineBreak/>
-                        <Hyperlink NavigateUri="https://cambiosrafa.azurewebsites.net">
-                            <TextBlock Text="Currency Converter" Margin="5"/>
+                        <Hyperlink NavigateUri="https://cambiosrafa.azurewebsites.net" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="none">
+                            <TextBlock Text="https://cambiosrafa.azurewebsites.net (API only)" Margin="5"/>
                         </Hyperlink>
                         <TextBlock Text="version n/a" Margin="100,5"/>
                     </TextBlock>

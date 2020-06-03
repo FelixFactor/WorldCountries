@@ -1,6 +1,5 @@
 ﻿namespace CountriesAPP
 {
-    using Services;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -14,7 +13,9 @@
     using CountriesAPP.Models.API_Models;
     using System.Linq;
     using MyToolkit.Utilities;
-
+    using Services;
+    using System.Windows.Input;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -69,12 +70,14 @@
         {
             try
             {
+                Mouse.OverrideCursor = Cursors.Wait;
+
                 LoadingBar.Value = 0;
 
                 //check if there is internet connection
                 networkService = new NetworkService();
                 //TODO true for testing
-                if (networkService.CheckNetConnection())
+                if (!networkService.CheckNetConnection())
                 {
                     LoadFromDB();
                     LblLoadFrom.Text = $"Data loaded from local DataBase on {DateTime.Now}";
@@ -96,20 +99,22 @@
                     return;
                 }
 
-                //adds the items from the list to a the dropdown list, displays the attribute Name from the list
-                CbCountry.ItemsSource = Countries;
-                CbCountry.DisplayMemberPath = "Name";
-                CbCountry.Text = "Select a Country";
-
                 await CreateAdvancedSearchData();
-
-                LoadingBar.Value = 100;
 
                 //when connected to the internet saves/updates data in DB
                 if (network)
                 {
                     await CheckLastUpdate();
                 }
+
+                //adds the items from the list to a the dropdown list, displays the attribute Name from the list
+                Countries.Add(new Country { Name = " --Select a Country--" });
+                Countries = Countries.OrderBy(x => x.Name).ToList();
+                CbCountry.ItemsSource = Countries;
+                CbCountry.DisplayMemberPath = "Name";
+                CbCountry.Text = " --Select a Country--";
+
+                LoadingBar.Value = 100;
 
                 //delaying the Data Saved lbl
                 await Task.Delay(5000);
@@ -119,6 +124,10 @@
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
             }
         }
 
@@ -260,7 +269,7 @@
             {
                 selected = (Country)CbCountry.SelectedItem;
 
-                if (selected == null)
+                if (selected == null || CbCountry.SelectedIndex == 0)
                 {
                     return;
                 }
@@ -357,17 +366,6 @@
         }
 
         /// <summary>
-        /// Event click - Shows menu advanced search
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AdvancedSearch_Click(object sender, RoutedEventArgs e)
-        {
-            TbLink.Visibility = Visibility.Collapsed;
-            StackAdvanced.Visibility = Visibility.Visible;
-        }
-
-        /// <summary>
         /// async sets up the combo boxes for the advanced search
         /// </summary>
         /// <returns></returns>
@@ -382,11 +380,33 @@
                 }
             });
 
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < Regions.Count; i++)
+                {
+                    if (Regions[i] == string.Empty)
+                    {
+                        Regions[i] = "No Region";
+                    }
+                }
+            });
+
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < SubRegions.Count; i++)
+                {
+                    if (SubRegions[i] == string.Empty)
+                    {
+                        SubRegions[i] = "No SubRegion";
+                    }
+                }
+            });
+
             Regions = Regions.DistinctBy(x => x.Length).OrderBy(x => x.Substring(0)).ToList();
             SubRegions = SubRegions.DistinctBy(x => x.Substring(0)).OrderBy(x => x.Substring(0)).ToList();
 
             CbRegion.ItemsSource = Regions;
-            
+
             CbSubRegion.ItemsSource = SubRegions;
         }
 
@@ -406,11 +426,22 @@
 
                 string filterRegion = CbRegion.SelectedValue.ToString();
 
+                if (filterRegion == "No Region")
+                {
+                    filterRegion = string.Empty;
+                }
+
                 filtered = Countries.Where(x => x.Region == filterRegion).ToList();
-                
+
                 CbCountry.ItemsSource = filtered;
 
                 List<string> filterSubRegion = new List<string>();
+
+                if (filterRegion == string.Empty || filterRegion == "Polar")
+                {
+                    CbSubRegion.ItemsSource = null;
+                    return;
+                }
 
                 await Task.Run(() =>
                 {
@@ -446,6 +477,11 @@
 
                 string filterRegion = CbSubRegion.SelectedValue.ToString();
 
+                if (filterRegion == "No SubRegion")
+                {
+                    filterRegion = string.Empty;
+                }
+
                 filtered = Countries.Where(x => x.Subregion == filterRegion).ToList();
 
                 CbCountry.ItemsSource = filtered;
@@ -468,6 +504,7 @@
             CbSubRegion.ItemsSource = SubRegions;
             CbSubRegion.SelectedIndex = -1;
             CbCountry.ItemsSource = Countries;
+            CbCountry.Text = " --Select a Country--";
         }
 
         /// <summary>
@@ -479,6 +516,22 @@
         {
             TbLink.Visibility = Visibility.Visible;
             StackAdvanced.Visibility = Visibility.Collapsed;
+        }
+
+        /// <summary>
+        /// Event click - Shows menu advanced search
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AdvancedSearch_Click(object sender, RoutedEventArgs e)
+        {
+            TbLink.Visibility = Visibility.Collapsed;
+            StackAdvanced.Visibility = Visibility.Visible;
+        }
+
+        private void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
         }
     }
 }
