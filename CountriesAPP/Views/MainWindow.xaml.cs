@@ -15,7 +15,6 @@
     using MyToolkit.Utilities;
     using Services;
     using System.Windows.Input;
-    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -30,6 +29,7 @@
         private SQLService dataService;
         private bool network;
         private bool firstRun;
+        private bool saving;
         private List<Country> filtered;
         private List<string> Regions;
         private List<string> SubRegions;
@@ -115,11 +115,6 @@
                 CbCountry.Text = " --Select a Country--";
 
                 LoadingBar.Value = 100;
-
-                //delaying the Data Saved lbl
-                await Task.Delay(5000);
-
-                LblLoadSave.Visibility = Visibility.Hidden;
             }
             catch (Exception ex)
             {
@@ -128,6 +123,12 @@
             finally
             {
                 Mouse.OverrideCursor = null;
+                saving = false;
+
+                //delaying the Data Saved lbl
+                await Task.Delay(5000);
+                LblLoadSave.Visibility = Visibility.Hidden;
+                
             }
         }
 
@@ -137,6 +138,7 @@
         /// <returns></returns>
         private async Task CheckLastUpdate()
         {
+            saving = true;
             string path = $"Data/config.sys";
             //1st run
             if (!File.Exists(path))
@@ -342,8 +344,17 @@
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BtnExit_Click(object sender, RoutedEventArgs e)
+        private async void BtnExit_Click(object sender, RoutedEventArgs e)
         {
+            if (saving)
+            {
+                await Task.Run(() =>
+                {
+                    MessageBox.Show("Please be patient\n We are saving the data!");
+                });
+                return;
+            }
+            
             this.Close();
         }
 
