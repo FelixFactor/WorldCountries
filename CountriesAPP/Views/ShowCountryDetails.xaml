@@ -173,7 +173,7 @@
                             <TextBlock Text="Currency Converter" Margin="10,10,0,0" Foreground="Gray"/>
                             <StackPanel Margin="10,10,0,0" Orientation="Horizontal">
                                 <TextBlock Text="Convert:" VerticalAlignment="Center"/>
-                                <TextBox Background="White" x:Name="TbMoney" Width="60" PreviewTextInput="NumberValidationTextBox" MaxLength="6" TextChanged="TbMoney_TextChanged" RenderTransformOrigin="0.467,0.567"/>
+                                <TextBox Background="White" x:Name="TbMoney" Width="60" HorizontalContentAlignment="Right" PreviewTextInput="NumberValidationTextBox" MaxLength="6" TextChanged="TbMoney_TextChanged" RenderTransformOrigin="0.467,0.567"/>
                                 <ComboBox x:Name="CbRateCountry" ItemsSource="{Binding Currencies}" DisplayMemberPath="Code" SelectedIndex="0" Margin="5,0"/>
                             </StackPanel>
                             <StackPanel Margin="10,10,0,0" Orientation="Horizontal">
